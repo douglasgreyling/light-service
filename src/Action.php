@@ -15,12 +15,10 @@ use ExpectedKeysNotInContextException;
 use PromisedKeysNotInContextException;
 
 trait Action {
-  // test what happens when expects is present and empty
   public static function expects() {
     return [];
   }
 
-  // test what happens when promises is present and empty
   public static function promises() {
     return [];
   }

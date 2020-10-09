@@ -11,16 +11,16 @@ it('returns no context validation errors with empty expected keys', function() {
     expect($action->success())->toBeTrue();
 });
 
-it('raises an error when the expected keys are not in the context', function() {
+it('throws an exception when the expected keys are not in the context', function() {
     SuccessfulAction::call(['a' => 1]);
 })->throws(ExpectedKeysNotInContextException::class);
 
-it('returns no context validation errors with empty promised keys', function() {
+it('returns no context validation exceptions with empty promised keys', function() {
     $action = NoMissingPromisesAction::call(['a' => 1, 'b' => 2]);
 
     expect($action->success())->toBeTrue();
 });
 
-it('raises an error when the promised keys are not in the context', function() {
+it('throws an exception when the promised keys are not in the context', function() {
     MissingPromisesAction::call(['a' => 1, 'b' => 2]);
 })->throws(PromisedKeysNotInContextException::class);

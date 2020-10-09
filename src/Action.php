@@ -23,7 +23,6 @@ trait Action {
     return [];
   }
 
-  // test what happens when executed is not implemented
   public static function executed($context) {
     throw new NotImplementedException();
   }
@@ -32,7 +31,7 @@ trait Action {
   // test that the error is raised after being caught
   // test what happens when the context given is a ActionContext (could change to a organizer context later)
   // test what happens when the context given is an array
-  public static function call($context) {
+  public static function call($context = []) {
     $context = is_a($context, 'ActionContext') ? $context : new ActionContext($context);
 
     try {

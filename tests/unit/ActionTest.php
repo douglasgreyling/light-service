@@ -1,8 +1,9 @@
 <?php
 
+require 'tests/fixtures/MissingPromisesAction.php';
+require 'tests/fixtures/NoExecutedFunctionAction.php';
 require 'tests/fixtures/NoMissingExpectsAction.php';
 require 'tests/fixtures/NoMissingPromisesAction.php';
-require 'tests/fixtures/MissingPromisesAction.php';
 require 'tests/fixtures/SuccessfulAction.php';
 
 it('returns no context validation errors with empty expected keys', function() {
@@ -24,3 +25,7 @@ it('returns no context validation exceptions with empty promised keys', function
 it('throws an exception when the promised keys are not in the context', function() {
     MissingPromisesAction::call(['a' => 1, 'b' => 2]);
 })->throws(PromisedKeysNotInContextException::class);
+
+it('throws an exception when the executed function is not implemented', function() {
+    NoExecutedFunctionAction::call(['a' => 1, 'b' => 2]);
+})->throws(NotImplementedException::class);

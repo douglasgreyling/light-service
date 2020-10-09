@@ -1,0 +1,8 @@
+{
+  "require-dev": {
+    "phpunit/phpunit": "^9.3.10",
+    "pestphp/pest": "^0.3.8"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

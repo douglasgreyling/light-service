@@ -13,7 +13,7 @@ class MyAction {
     return ['c'];
   }
 
-  public static function executed($context) {
+  private static function execute($context) {
     $a = $context['a'];
     $b = $context['b'];
 
@@ -26,5 +26,3 @@ class MyAction {
     return $a + $b;
   }
 }
-
-var_dump(MyAction::call(['a' => 1, 'b' => 2]));

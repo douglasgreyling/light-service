@@ -8,29 +8,25 @@ require 'tests/fixtures/SuccessfulAction.php';
 require 'tests/fixtures/UnexpectedErrorAction.php';
 
 it('returns no context validation errors with empty expected keys', function() {
-    $action = NoMissingExpectsAction::call(['a' => 1, 'b' => 2]);
+    $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 
-    expect($action->success())->toBeTrue();
+    expect($result->success())->toBeTrue();
 });
 
 it('throws an exception when the expected keys are not in the context', function() {
-    SuccessfulAction::call(['a' => 1]);
+    SuccessfulAction::execute(['a' => 1]);
 })->throws(ExpectedKeysNotInContextException::class);
 
 it('returns no context validation exceptions with empty promised keys', function() {
-    $action = NoMissingPromisesAction::call(['a' => 1, 'b' => 2]);
+    $result = NoMissingPromisesAction::execute(['a' => 1, 'b' => 2]);
 
-    expect($action->success())->toBeTrue();
+    expect($result->success())->toBeTrue();
 });
 
 it('throws an exception when the promised keys are not in the context', function() {
-    MissingPromisesAction::call(['a' => 1, 'b' => 2]);
+    MissingPromisesAction::execute(['a' => 1, 'b' => 2]);
 })->throws(PromisedKeysNotInContextException::class);
 
 it('throws an exception when the executed function is not implemented', function() {
-    NoExecutedFunctionAction::call(['a' => 1, 'b' => 2]);
+    NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
 })->throws(NotImplementedException::class);
-
-it('marks the action context as failed whenever an unexpected exception is thrown', function() {
-    UnexpectedErrorAction::call(['a' => 1, 'b' => 2]);
-})->throws(Exception::class, 'Foo');;

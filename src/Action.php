@@ -15,57 +15,60 @@ use ExpectedKeysNotInContextException;
 use PromisedKeysNotInContextException;
 
 trait Action {
-  public static function expects() {
-    return [];
+  private $context;
+
+  public function __construct($context) {
+    $this->context = is_a($context, ActionContext::class) ? $context : new ActionContext($context);
   }
 
-  public static function promises() {
-    return [];
+  public function run() {
+    $this->validate_expected_keys();
+    $this->executed();
+    $this->validate_promised_keys();
+
+    return $this->context;
   }
 
-  public static function executed($context) {
+  private function executed() {
     throw new NotImplementedException();
   }
 
-  // test that the context is marked as failed with an exception
-  // test that the error is raised after being caught
+  private function fail($message = '') {
+    $this->context->fail($message);
+  }
+
   // test what happens when the context given is a ActionContext (could change to a organizer context later)
   // test what happens when the context given is an array
-  public static function call($context = []) {
-    $context = is_a($context, 'ActionContext') ? $context : new ActionContext($context);
 
-    try {
-      self::validateExpectedKeys($context);
-      self::executed($context);
-      self::validatePromisedKeys($context);
-      // Change this so it handle two key exceptions and doesnt catch all exceptions
-    } catch (\Exception $e) {
-      $context['failure'] = true;
-      throw $e;
-    }
-
-    return $context;
+  public static function execute($context) {
+    return (new self($context))->run();
   }
 
   // test what happens when expects is empty and empty
   // test what happens when expects is not an array
   // test what happens when expects partially has accepted keys
-  private static function validateExpectedKeys($context) {
-    $expected_keys_length = count(self::expects());
-    $matched_keys         = array_keys($context->fetch(self::expects()));
+  private function validate_expected_keys() {
+    $expected_keys        = isset($this->expects) ? $this->expects : [];
+    $expected_keys_length = count($expected_keys);
+    $matched_keys         = array_keys($this->context->fetch($expected_keys));
 
     if ($expected_keys_length != count($matched_keys))
-      throw new ExpectedKeysNotInContextException(join(', ', array_diff(self::expects(), $matched_keys)));
+      throw new ExpectedKeysNotInContextException(join(', ', array_diff($expected_keys, $matched_keys)));
   }
 
   // test what happens when promises is empty and empty
   // test what happens when promises is not an array
   // test what happens when promises partially has accepted keys
-  private static function validatePromisedKeys($context) {
-    $promised_keys_length = count(self::promises());
-    $matched_keys         = array_keys($context->fetch(self::promises()));
+  private function validate_promised_keys() {
+    $promised_keys        = isset($this->promises) ? $this->promises : [];
+    $promised_keys_length = count($promised_keys);
+    $matched_keys         = array_keys($this->context->fetch($promised_keys));
 
     if ($promised_keys_length != count($matched_keys))
-      throw new PromisedKeysNotInContextException(join(', ', array_diff(self::promises(), $matched_keys)));
+      throw new PromisedKeysNotInContextException(join(', ', array_diff($promised_keys, $matched_keys)));
+  }
+
+  public function context() {
+    return $this->context;
   }
 }

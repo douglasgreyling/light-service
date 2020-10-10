@@ -4,6 +4,7 @@ class ActionContext implements ArrayAccess {
     private $context = [];
     private $failure = false;
     private $success = true;
+    private $message = '';
 
     public function __construct($context = []) {
         $this->context = $context;
@@ -15,6 +16,10 @@ class ActionContext implements ArrayAccess {
 
     public function success() {
         return $this->success;
+    }
+
+    public function message() {
+        return $this->message;
     }
 
     public function offsetSet($key, $value) {
@@ -75,5 +80,11 @@ class ActionContext implements ArrayAccess {
 
     public function to_array() {
         return $this->context;
+    }
+
+    public function fail($message = '') {
+        $this->failure = true;
+        $this->success = false;
+        $this->message = $message;
     }
 }

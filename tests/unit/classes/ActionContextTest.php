@@ -130,3 +130,21 @@ it('can retrieve multiple key/value pairs using the fetch method', function() {
 
     expect($context->fetch(['a', 'c']))->toEqual(['a' => 1, 'c' => 3]);
 });
+
+it('marks the failure flag as true and the success flag as false when the context is explicitly failed', function() {
+    $state   = ['a' => 1, 'b' => 2, 'c' => 3];
+    $context = new ActionContext($state);
+
+    $context->fail();
+
+    expect($context->failure())->toBeTrue();
+});
+
+it('can add an additional failure message when the context is explicitly failed', function() {
+    $state   = ['a' => 1, 'b' => 2, 'c' => 3];
+    $context = new ActionContext($state);
+
+    $context->fail('foo');
+
+    expect($context->message())->toEqual('foo');
+});

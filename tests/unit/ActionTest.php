@@ -1,6 +1,7 @@
 <?php
 
-require 'tests/fixtures/MissingPromisesAction.php';
+require 'tests/fixtures/MissingAllPromisesAction.php';
+require 'tests/fixtures/MissingSomePromisesAction.php';
 require 'tests/fixtures/NextActionAction.php';
 require 'tests/fixtures/NoExecutedFunctionAction.php';
 require 'tests/fixtures/NoMissingExpectsAction.php';
@@ -27,7 +28,11 @@ it('returns no context validation errors with empty expected keys', function() {
     expect($result->success())->toBeTrue();
 });
 
-it('throws an exception when the expected keys are not in the context', function() {
+it('throws an exception when all of the expected keys are not in the context', function() {
+    SuccessfulAction::execute([]);
+})->throws(ExpectedKeysNotInContextException::class);
+
+it('throws an exception some of the expected keys are not in the context', function() {
     SuccessfulAction::execute(['a' => 1]);
 })->throws(ExpectedKeysNotInContextException::class);
 
@@ -37,8 +42,12 @@ it('returns no context validation exceptions with empty promised keys', function
     expect($result->success())->toBeTrue();
 });
 
-it('throws an exception when the promised keys are not in the context', function() {
-    MissingPromisesAction::execute(['a' => 1, 'b' => 2]);
+it('throws an exception when all of the the promised keys are not in the context', function() {
+    MissingAllPromisesAction::execute(['a' => 1, 'b' => 2]);
+})->throws(PromisedKeysNotInContextException::class);
+
+it('throws an exception some of the the promised keys are not in the context', function() {
+    MissingSomePromisesAction::execute(['a' => 1, 'b' => 2]);
 })->throws(PromisedKeysNotInContextException::class);
 
 it('throws an exception when the executed function is not implemented', function() {

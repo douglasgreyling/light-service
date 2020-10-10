@@ -2,17 +2,19 @@
 
 require_once 'src/Action.php';
 
-class MissingPromisesAction {
+class MissingSomePromisesAction {
     use LightServicePHP\Action;
 
     private $expects = ['a', 'b'];
-    private $promises = ['c'];
+    private $promises = ['c', 'd'];
 
     private function executed() {
         $a = $this->context['a'];
         $b = $this->context['b'];
 
         $c = $this->adds($a, $b);
+
+        $this->context->c = $c;
     }
 
     private function adds($a, $b) {

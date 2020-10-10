@@ -39,16 +39,10 @@ trait Action {
         throw new NotImplementedException();
     }
 
-    // test what happens when the context given is a ActionContext (could change to a organizer context later)
-    // test what happens when the context given is an array
-
     public static function execute($context) {
         return (new self($context))->run();
     }
 
-    // test what happens when expects is empty and empty
-    // test what happens when expects is not an array
-    // test what happens when expects partially has accepted keys
     private function validate_expected_keys() {
         $expected_keys        = isset($this->expects) ? $this->expects : [];
         $expected_keys_length = count($expected_keys);
@@ -58,9 +52,6 @@ trait Action {
         throw new ExpectedKeysNotInContextException(join(', ', array_diff($expected_keys, $matched_keys)));
     }
 
-    // test what happens when promises is empty and empty
-    // test what happens when promises is not an array
-    // test what happens when promises partially has accepted keys
     private function validate_promised_keys() {
         $promised_keys        = isset($this->promises) ? $this->promises : [];
         $promised_keys_length = count($promised_keys);

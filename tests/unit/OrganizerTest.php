@@ -1,10 +1,10 @@
 <?php
 
-require_once 'tests/fixtures/NoCallFunctionOrganizer.php';
-require_once 'tests/fixtures/DoesNothingOrganizer.php';
-require_once 'tests/fixtures/SuccessfulOrganizer.php';
-require_once 'tests/fixtures/OneSkipOrganizer.php';
-require_once 'tests/fixtures/FailingOrganizer.php';
+require_once 'tests/fixtures/organizers/NoCallFunctionOrganizer.php';
+require_once 'tests/fixtures/organizers/DoesNothingOrganizer.php';
+require_once 'tests/fixtures/organizers/SuccessfulOrganizer.php';
+require_once 'tests/fixtures/organizers/OneSkipOrganizer.php';
+require_once 'tests/fixtures/organizers/FailingOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();

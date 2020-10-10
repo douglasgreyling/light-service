@@ -1,7 +1,7 @@
 <?php
 
 require_once 'src/organizer.php';
-require_once 'tests/fixtures/AddsOneAction.php';
+require_once 'tests/fixtures/actions/AddsOneAction.php';
 
 class SuccessfulOrganizer {
     use LightServicePHP\Organizer;

@@ -1,7 +1,7 @@
 <?php
 
 require_once 'src/organizer.php';
-require_once 'tests/fixtures/DoesNothingAction.php';
+require_once 'tests/fixtures/actions/DoesNothingAction.php';
 
 class DoesNothingOrganizer {
     use LightServicePHP\Organizer;

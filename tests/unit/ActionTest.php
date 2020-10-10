@@ -1,13 +1,13 @@
 <?php
 
-require_once 'tests/fixtures/MissingAllPromisesAction.php';
-require_once 'tests/fixtures/MissingSomePromisesAction.php';
-require_once 'tests/fixtures/NextActionAction.php';
-require_once 'tests/fixtures/NoExecutedFunctionAction.php';
-require_once 'tests/fixtures/NoMissingExpectsAction.php';
-require_once 'tests/fixtures/NoMissingPromisesAction.php';
-require_once 'tests/fixtures/SuccessfulAction.php';
-require_once 'tests/fixtures/UnexpectedErrorAction.php';
+require_once 'tests/fixtures/actions/MissingAllPromisesAction.php';
+require_once 'tests/fixtures/actions/MissingSomePromisesAction.php';
+require_once 'tests/fixtures/actions/NextActionAction.php';
+require_once 'tests/fixtures/actions/NoExecutedFunctionAction.php';
+require_once 'tests/fixtures/actions/NoMissingExpectsAction.php';
+require_once 'tests/fixtures/actions/NoMissingPromisesAction.php';
+require_once 'tests/fixtures/actions/SuccessfulAction.php';
+require_once 'tests/fixtures/actions/UnexpectedErrorAction.php';
 
 it('can be instantiated with an associated array as context', function() {
     $action = new SuccessfulAction(['a' => 1, 'b' => 2]);

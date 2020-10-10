@@ -3,16 +3,16 @@
 require_once 'src/Action.php';
 
 class UnexpectedErrorAction {
-  use LightServicePHP\Action;
+    use LightServicePHP\Action;
 
-  private $expects  = ['a', 'b'];
-  private $promises = ['c'];
+    private $expects  = ['a', 'b'];
+    private $promises = ['c'];
 
-  private function executed() {
-    throw new Exception('Foo');
-  }
+    private function executed() {
+        throw new Exception('Foo');
+    }
 
-  private function adds($a, $b) {
-    return $a + $b;
-  }
+    private function adds($a, $b) {
+        return $a + $b;
+    }
 }

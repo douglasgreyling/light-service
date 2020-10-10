@@ -17,7 +17,7 @@ trait Organizer {
         $this->context = new ActionContext($context);
     }
 
-    public function call() {
+    public static function call() {
         throw new NotImplementedException;
     }
 

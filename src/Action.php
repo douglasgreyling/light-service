@@ -4,10 +4,10 @@ namespace LightServicePHP;
 
 require_once 'classes/ActionContext.php';
 
-require 'exceptions/ExpectedKeysNotInContextException.php';
-require 'exceptions/NextActionException.php';
+require_once 'exceptions/ExpectedKeysNotInContextException.php';
+require_once 'exceptions/NextActionException.php';
 require_once 'exceptions/NotImplementedException.php';
-require 'exceptions/PromisedKeysNotInContextException.php';
+require_once 'exceptions/PromisedKeysNotInContextException.php';
 
 use ActionContext;
 

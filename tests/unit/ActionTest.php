@@ -8,6 +8,19 @@ require 'tests/fixtures/NoMissingPromisesAction.php';
 require 'tests/fixtures/SuccessfulAction.php';
 require 'tests/fixtures/UnexpectedErrorAction.php';
 
+it('can be instantiated with an associated array as context', function() {
+    $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
+
+    expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
+});
+
+it('can be instantiated with an ActionContext as context', function() {
+    $action_context = new ActionContext(['a' => 1, 'b' => 2]);
+    $action         = new SuccessfulAction($action_context);
+
+    expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
+});
+
 it('returns no context validation errors with empty expected keys', function() {
     $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 

@@ -4,14 +4,16 @@ namespace LightServicePHP;
 
 require 'classes/ActionContext.php';
 
-require 'exceptions/NotImplementedException.php';
 require 'exceptions/ExpectedKeysNotInContextException.php';
+require 'exceptions/NextActionException.php';
+require 'exceptions/NotImplementedException.php';
 require 'exceptions/PromisedKeysNotInContextException.php';
 
 use ActionContext;
 
-use NotImplementedException;
 use ExpectedKeysNotInContextException;
+use NextActionException;
+use NotImplementedException;
 use PromisedKeysNotInContextException;
 
 trait Action {
@@ -22,19 +24,19 @@ trait Action {
   }
 
   public function run() {
-    $this->validate_expected_keys();
-    $this->executed();
-    $this->validate_promised_keys();
+    try {
+      $this->validate_expected_keys();
+      $this->executed();
+      $this->validate_promised_keys();
+    } catch (NextActionException $e) {
+      return $this->context;
+    }
 
     return $this->context;
   }
 
   private function executed() {
     throw new NotImplementedException();
-  }
-
-  private function fail($message = '') {
-    $this->context->fail($message);
   }
 
   // test what happens when the context given is a ActionContext (could change to a organizer context later)
@@ -70,5 +72,9 @@ trait Action {
 
   public function context() {
     return $this->context;
+  }
+
+  private function next_action() {
+    throw new NextActionException;
   }
 }

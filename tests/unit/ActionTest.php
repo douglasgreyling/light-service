@@ -1,6 +1,7 @@
 <?php
 
 require 'tests/fixtures/MissingPromisesAction.php';
+require 'tests/fixtures/NextActionAction.php';
 require 'tests/fixtures/NoExecutedFunctionAction.php';
 require 'tests/fixtures/NoMissingExpectsAction.php';
 require 'tests/fixtures/NoMissingPromisesAction.php';
@@ -30,3 +31,11 @@ it('throws an exception when the promised keys are not in the context', function
 it('throws an exception when the executed function is not implemented', function() {
     NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
 })->throws(NotImplementedException::class);
+
+it('can mark the current context as failed with a message using the fail method', function() {
+    $result = NextActionAction::execute(['a' => 1, 'b' => 2]);
+
+    expect($result->failure())->toBeFalse();
+    expect($result->success())->toBeTrue();
+    expect($result->keys())->not()->toHaveKey('d');
+});

@@ -1,6 +1,7 @@
 <?php
 
 require_once 'src/classes/ActionContext.php';
+require_once 'src/exceptions/NextActionException.php';
 
 it('is instantiated with an empty context when given no state', function() {
     $context = new ActionContext();
@@ -147,4 +148,18 @@ it('can add an additional failure message when the context is explicitly failed'
     $context->fail('foo');
 
     expect($context->message())->toEqual('foo');
+});
+
+it('can mark the failure flag as true and throw a NextActionException when the fail_and_return function is called', function() {
+    $context = new ActionContext([]);
+    $correct_exception_thrown = false;
+
+    try {
+        $context->fail_and_return('foo');
+    } catch (NextActionException $e) {
+        $correct_exception_thrown = true;
+    }
+
+    expect($correct_exception_thrown)->toBeTrue();
+    expect($context->failure())->toBeTrue();
 });

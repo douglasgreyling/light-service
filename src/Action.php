@@ -28,9 +28,7 @@ trait Action {
             $this->validate_expected_keys();
             $this->executed($this->context);
             $this->validate_promised_keys();
-        } catch (NextActionException $e) {
-            return $this->context;
-        }
+        } catch (NextActionException $e) {}
 
         return $this->context;
     }
@@ -39,7 +37,7 @@ trait Action {
         throw new NotImplementedException();
     }
 
-    public static function execute($context) {
+    public static function execute($context = []) {
         return (new self($context))->run();
     }
 

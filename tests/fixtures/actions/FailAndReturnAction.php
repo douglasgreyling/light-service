@@ -2,10 +2,11 @@
 
 require_once 'src/Action.php';
 
-class FailingAction {
+class FailAndReturnAction {
     use LightServicePHP\Action;
 
     private function executed($context) {
-        $context->fail('foo');
+        $context->fail_and_return('foo');
+        $context->one = true;
     }
 }

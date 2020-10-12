@@ -8,6 +8,7 @@ require_once 'tests/fixtures/actions/NoMissingExpectsAction.php';
 require_once 'tests/fixtures/actions/NoMissingPromisesAction.php';
 require_once 'tests/fixtures/actions/SuccessfulAction.php';
 require_once 'tests/fixtures/actions/UnexpectedErrorAction.php';
+require_once 'tests/fixtures/actions/FailAndReturnAction.php';
 
 it('can be instantiated with an associated array as context', function() {
     $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
@@ -67,4 +68,11 @@ it('can mark the current context as failed with a message using the fail functio
 
     expect($result->failure())->toBeTrue();
     expect($result->success())->toBeFalse();
+});
+
+it('can mark the curernt context as failed and move onto the next context using the fail_and_return function', function() {
+    $result = FailAndReturnAction::execute();
+
+    expect($result->failure())->toBeTrue();
+    expect($result->keys())->not()->toHaveKey('one');
 });

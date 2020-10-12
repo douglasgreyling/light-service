@@ -1,5 +1,7 @@
 <?php
 
+// require_once '../exceptions/NextActionException.php';
+
 class ActionContext implements ArrayAccess {
     private $context = [];
     private $failure = false;
@@ -86,5 +88,10 @@ class ActionContext implements ArrayAccess {
         $this->failure = true;
         $this->success = false;
         $this->message = $message;
+    }
+
+    public function fail_and_return($message = '') {
+        $this->fail($message);
+        throw new NextActionException;
     }
 }

@@ -9,12 +9,12 @@ class SuccessfulAction {
     private $promises = ['c'];
 
     private function executed() {
-        $a = $this->context['a'];
-        $b = $this->context['b'];
+        $a = $context['a'];
+        $b = $context['b'];
 
         $c = $this->adds($a, $b);
 
-        $this->context['c'] = $c;
+        $context['c'] = $c;
     }
 
     private function adds($a, $b) {

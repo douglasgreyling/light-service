@@ -20,8 +20,8 @@ class AddsOneAction {
     private $expects  = ['num'];
     private $promises = ['num'];
 
-    private function executed() {
-        $this->context->num += 1;
+    private function executed($context) {
+        $context->num += 1;
     }
 }
 
@@ -31,7 +31,7 @@ class AddsTwoAction {
     private $expects  = ['num'];
     private $promises = ['num'];
 
-    private function executed() {
-        $this->context->num += 2;
+    private function executed($context) {
+        $context->num += 2;
     }
 }

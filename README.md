@@ -153,7 +153,7 @@ class GreetsAndFeedsSomeone {
 $result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
 ```
 
-And that's your first organizer! It ties two actions together through a static method `call`. The organizer call function takes any name and uses it to setup an initial context (this is what the `with` function does). The organizer then executes each of the actions on after another with the `reduce` method.
+And that's your first organizer! It ties two actions together through a static function `call`. The organizer call function takes any name and uses it to setup an initial context (this is what the `with` function does). The organizer then executes each of the actions on after another with the `reduce` function.
 
 As your actions are exectuted they will add/remove to the context you initially set up.
 
@@ -307,9 +307,9 @@ However, sometimes not everything will play out as you expect it. An external AP
 
 #### Failing the context:
 
-When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` method can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
+When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` function can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
 
-In case you want to fail the context and stop the execution of the executed block, use the `fail_and_return('something went wrong')` method. This will immediately fail the context and cause the execute function to return.
+In case you want to fail the context and stop the execution of the executed block, use the `fail_and_return('something went wrong')` function. This will immediately fail the context and cause the execute function to return.
 
 Here's an example:
 

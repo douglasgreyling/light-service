@@ -8,7 +8,7 @@ class UnexpectedErrorAction {
     private $expects  = ['a', 'b'];
     private $promises = ['c'];
 
-    private function executed() {
+    private function executed($context) {
         throw new Exception('Foo');
     }
 

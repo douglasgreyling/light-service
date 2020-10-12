@@ -5,10 +5,10 @@ require_once 'src/Action.php';
 class NextActionAction {
     use LightServicePHP\Action;
 
-    private function executed() {
-        $this->next_action();
+    private function executed($context) {
+        $this->next_context();
 
-        $this->context->d = 5;
+        $context->d = 5;
     }
 
     private function adds($a, $b) {

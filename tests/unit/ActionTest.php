@@ -54,10 +54,17 @@ it('throws an exception when the executed function is not implemented', function
     NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
 })->throws(NotImplementedException::class);
 
-it('can mark the current context as failed with a message using the fail method', function() {
+it('can skip to the next action using the next_context function', function() {
     $result = NextActionAction::execute(['a' => 1, 'b' => 2]);
 
     expect($result->failure())->toBeFalse();
     expect($result->success())->toBeTrue();
     expect($result->keys())->not()->toHaveKey('d');
+});
+
+it('can mark the current context as failed with a message using the fail function', function() {
+    $result = FailingAction::execute(['a' => 1, 'b' => 2]);
+
+    expect($result->failure())->toBeTrue();
+    expect($result->success())->toBeFalse();
 });

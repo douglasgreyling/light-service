@@ -8,13 +8,13 @@ class MissingSomePromisesAction {
     private $expects = ['a', 'b'];
     private $promises = ['c', 'd'];
 
-    private function executed() {
-        $a = $this->context['a'];
-        $b = $this->context['b'];
+    private function executed($context) {
+        $a = $context['a'];
+        $b = $context['b'];
 
         $c = $this->adds($a, $b);
 
-        $this->context->c = $c;
+        $context->c = $c;
     }
 
     private function adds($a, $b) {

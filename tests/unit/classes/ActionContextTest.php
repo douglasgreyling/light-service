@@ -47,19 +47,19 @@ it('returns a value of null when the key being fetched does not exist in the con
     expect($context->get('b'))->toBeNull();
 });
 
-it('can retrieve values using the get method', function() {
+it('can retrieve values using the get function', function() {
     $context = new ActionContext(['a' => 1]);
 
     expect($context->get('a'))->toEqual(1);
 });
 
-it('returns a value of null when the key passed to the get method does not exist in the context', function() {
+it('returns a value of null when the key passed to the get function does not exist in the context', function() {
     $context = new ActionContext(['a' => 1]);
 
     expect($context->get('b'))->toBeNull();
 });
 
-it('can set values using the set method', function() {
+it('can set values using the set function', function() {
     $context = new ActionContext();
 
     $context->set('a', 1);
@@ -87,7 +87,7 @@ it('returns a value of null when the property being fetched does not exist in th
     expect($context->b)->toBeNull();
 });
 
-it('can merge a set of key/value pairs into the context using the merge method', function() {
+it('can merge a set of key/value pairs into the context using the merge function', function() {
     $context = new ActionContext(['a' => 1]);
 
     $context->merge(['b' => 2, 'c' => 3]);
@@ -95,7 +95,7 @@ it('can merge a set of key/value pairs into the context using the merge method',
     expect($context->to_array())->toEqual(['a' => 1, 'b' => 2, 'c' => 3]);
 });
 
-it('can merge a set of key/value pairs into the context using the array merge method', function() {
+it('can merge a set of key/value pairs into the context using the array merge function', function() {
     $context = new ActionContext(['a' => 1]);
 
     $context->array_merge(['b' => 2, 'c' => 3]);
@@ -103,14 +103,14 @@ it('can merge a set of key/value pairs into the context using the array merge me
     expect($context->to_array())->toEqual(['a' => 1, 'b' => 2, 'c' => 3]);
 });
 
-it('can retrieve the keys inside the context with the keys method', function () {
+it('can retrieve the keys inside the context with the keys function', function () {
     $state   = ['a' => 1, 'b' => 2];
     $context = new ActionContext($state);
 
     expect($context->keys())->toEqual(['a', 'b']);
 });
 
-it('can retrieve the values inside the context with the values method', function() {
+it('can retrieve the values inside the context with the values function', function() {
     $state   = ['a' => 1, 'b' => 2];
     $context = new ActionContext($state);
 
@@ -124,7 +124,7 @@ it('can return the current context as an array', function() {
     expect($context->to_array())->toEqual(['a' => 1, 'b' => 2]);
 });
 
-it('can retrieve multiple key/value pairs using the fetch method', function() {
+it('can retrieve multiple key/value pairs using the fetch function', function() {
     $state   = ['a' => 1, 'b' => 2, 'c' => 3];
     $context = new ActionContext($state);
 

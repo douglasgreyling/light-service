@@ -8,7 +8,7 @@ class AddsOneAction {
     private $expects  = ['number'];
     private $promises = ['number'];
 
-    private function executed() {
-        $this->context->number += 1;
+    private function executed($context) {
+        $context->number += 1;
     }
 }

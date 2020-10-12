@@ -26,7 +26,7 @@ trait Action {
     public function run() {
         try {
             $this->validate_expected_keys();
-            $this->executed();
+            $this->executed($this->context);
             $this->validate_promised_keys();
         } catch (NextActionException $e) {
             return $this->context;
@@ -35,7 +35,7 @@ trait Action {
         return $this->context;
     }
 
-    private function executed() {
+    private function executed($context) {
         throw new NotImplementedException();
     }
 
@@ -65,7 +65,7 @@ trait Action {
         return $this->context;
     }
 
-    private function next_action() {
+    private function next_context() {
         throw new NextActionException;
     }
 }

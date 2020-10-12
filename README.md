@@ -1,4 +1,4 @@
-# Light-Service-PHP:
+# LightService-PHP:
 
 A service object framework heavily, heavily, heavily inspired by the [LightService](https://github.com/adomokos/light-service) Ruby gem.
 
@@ -23,7 +23,7 @@ What do you think of this code?
 class TaxController extends SomeController {
   public function update {
     $order = Order::find(request('id'));
-    $tax_ranges = TaxRange->for_region($order->region);
+    $tax_ranges = TaxRange::for_region($order->region);
 
     if (is_null($tax_ranges)) {
       return ...; // render some view
@@ -48,52 +48,140 @@ class TaxController extends SomeController {
 
 This controller violates the [SRP](http://en.wikipedia.org/wiki/Single_responsibility_principle). Can you imagine testing something like this?
 
-You could move the `$tax_percentage` logic and calculations into a tax model,
-but then you'll be relying on heavy model logic.
+In this instance we have a fairly simple controller, but one shudders to think what controllers could look like in more complex codebases out there in the wild.
 
-Essentially, this controller does 3 things in a specific order:
+You could argue that you could clean up this controller by moving the `$tax_percentage` logic and calculations into a tax model, but then you'll be relying on heavy model logic.
 
-1. Looks up the tax percentage based on order total.
-2. Calculates the order tax.
-3. Provides free shipping if the total with tax is greater than \$200.
+If you've ever done debugging (haha, who hasn't?) you might find it difficult to determine what's going on and where you need to start. This is especially difficult when you have a high level overview of what the code does and what needs to happen to resolve your bug.
 
-The order of these tasks matters since you can't calculate the order tax without the percentage.
+Wouldn't it be nice if your code was broken up into smaller pieces which tell you exactly what they do?
 
-Wouldn't it be nice to see something in your code like this instead?
+In the case with our controller above, it would be great if our code dispelled any confusion by telling us that it was doing 3 simple things in a specific sequence whenever an order is updated:
 
-```php
-(
-  LooksUpTaxPercentage,
-  CalculatesOrderTax,
-  ProvidesFreeShipping
-)
-```
+1. Looking up the tax percentage based on order total.
+2. Calculating the order tax.
+3. Providing free shipping if the total with tax is greater than \$200.
 
-This block of code simplifies what's going on in your code since it tells a story by describing the steps in a clear manner.
+If you've ever felt the headache of fat controllers, difficult code to reason about, or seemingly endless rabbit holes, then this is where LightService comes in.
 
-LightService allows you to write your code this way.
+## How LightService works in 60 seconds:
 
-## How it works
+There are 2 key things to know about when working with LightService:
 
-### You start with an organizer:
+1. Actions.
+2. Organizers.
 
-An organizer essentially describes the set of actions which it will execute. It also describes the order in which the actions will be executed. The organizer is the bit of code which executes the actions one by one.
+**Actions** are the building blocks of getting stuff done in LightService. Actions focus on doing one thing really well. They can be executed on their own, but you'll often seem them bundled together with other actions inside Organizers.
 
-You can pass data to your organizer through something called 'context'. The context acts like a central store where your actions can add or retrieve bits of data they need to work. The context is a key way to have your actions interact with each other. More on this later!
+**Organizers** group multiple actions together to complete some task. Organizers consist of at least one action. Organizers execute actions in a set order, one at a time. Organizers use actions to tell you the 'story' of what will happen.
 
-### You fall in love with actions:
-
-Once you have an organizer describing the set of actions which need to occur, then you actually need to make them! Actions are simple objects which perform one thing really well.
-
-If you're a pictures then here's one that might help understand how organizers and actions interact with each other:
+Here's a diagram to understand the relationship between organizers and actions:
 
 ![LightService](resources/lightservice-interaction.png)
 
-## Let's build something!
+## Your first action
 
-So let's try make an organizer and the necessary actions for the controller above:
+Let's make a simple greeting action.
 
-### The organizer:
+```php
+class GreetsSomeoneAction {
+  use LightServicePHP\Action;
+
+  private $expects  = ['name'];
+  private $promises = ['greeting'];
+
+  private function executed($context) {
+    $context->greeting = "Hello, {$context->name}. Solved any fun mysteries lately?";
+  }
+}
+
+$result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
+```
+
+Actions take an optional list of expected inputs and can return an optional list of promised outputs. In this case we've told our action that it expects to receive an input called `name`.
+
+The `executed` function is the function which gets called whenever we execute/run our action. We can access the inputs available to this action through the `$context` variable. Likewise, we can add/set any outputs through the context as well.
+
+Once an action is run we can access the finished context, and the status of the action.
+
+```php
+$result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
+
+if ($result->success()) {
+  echo $result->greeting;
+}
+
+> "Hello, Scooby. Solved any fun mysteries lately?"
+```
+
+Actions try to promote simplicity. They either succeed, or they fail, and they have very clear inputs and outputs. They generally focus on doing one thing, and because of that they can be a dream to test!
+
+## Your first organizer
+
+Most times a simple action isn't enough. LightService lets you compose a bunch of actions into a single organizer. By bundling your simple actions into an organizer you can stitch very complicated business logic together in a manner that's very easy to reason about. Good organizers tell you a clear story!
+
+Before we create out organizer, let's create one more action:
+
+```php
+class FeedsSomeoneAction {
+  use LightServicePHP\Action;
+
+  private $expects = ['name'];
+
+  private function executed($context) {
+    $snack = Fridge::fetch('Grapes');
+
+    Person::find($context->name)->feed($snack);
+  }
+}
+```
+
+Now let's create our organizer like this:
+
+```php
+class GreetsAndFeedsSomeone {
+  use LightServicePHP\Organizer;
+
+  public static function call($name) {
+    return self::with(['name' => $name])->reduce(
+      GreetsSomeoneAction::class,
+      FeedSomeoneAction::class
+    );
+  }
+}
+
+$result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
+```
+
+And that's your first organizer! It ties two actions together through a static method `call`. The organizer call function takes any name and uses it to setup an initial context (this is what the `with` function does). The organizer then executes each of the actions on after another with the `reduce` method.
+
+As your actions are exectuted they will add/remove to the context you initially set up.
+
+Just like actions, organizers return the final context as their return value.
+
+```php
+$result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
+
+if ($result->success()) {
+  echo "Time to stock up on snacks!";
+}
+```
+
+Because organizers generally run through complex business logic, and every action has the potential to cause a failure, testing an organizer is functionally equivalent to an integration test.
+
+For more complex examples, take a look at the examples folder.
+
+## Simplifying our first tax example
+
+Let's clean up the controller we started with by using LightService.
+
+We'll begin by looking at the controller. We want to look for distinct steps which we can separate whenever we need to update the tax on an order. By doing this we notice 3 clear processes:
+
+1. Look up the tax percentage based on order total.
+2. Calculate the order tax.
+3. Provide free shipping if the total with tax is greater than \$200.
+
+#### The organizer:
 
 ```php
 class CalculatesTax {
@@ -109,11 +197,7 @@ class CalculatesTax {
 }
 ```
 
-And just like that we've made an organizer which starts out with a basic context which stores the order the actions will need to work on.
-
-### The actions:
-
-Let's start with looking up the tax percentage:
+#### Looking up the tax percentage:
 
 ```php
 class LooksUpTaxPercentageAction {
@@ -128,43 +212,26 @@ class LooksUpTaxPercentageAction {
 
     $this->context->tax_percentage = 0;
 
-    $tax_range_nil = $this->object_is_nil(
-                       $tax_ranges,
-                       $context,
-                       'The tax ranges were not found'
-                     );
+    if (is_null($tax_ranges)) {
+      $this->context->fail('The tax ranges were not found');
+      $this->next_context();
+    }
 
-    if ($tax_range_nil) {
+    $tax_percentage = $tax_ranges->for_total($order->total);
+
+    if (is_null($tax_percentage)) {
+      $this->context->fail('The tax percentage were not found');
       $this->next_context();
     }
 
     $this
       ->context
-      ->tax_percentage = $tax_ranges->for_total($order->total);
-
-    $tax_percentage_nil = $this->object_is_nil(
-                            $this->context->tax_percentage,
-                            $context,
-                            'The tax percentage were not found'
-                          );
-
-    if ($tax_percentage_nil) {
-      $this->next_context();
-    }
-  }
-
-  private function object_is_nil($object, $context, $message) {
-    if (is_null($object) {
-      $this->context->fail($message);
-      return true;
-    }
-
-    return false;
+      ->tax_percentage = $tax_percentage
   }
 }
 ```
 
-Now let's build the action which calculates the tax for the order:
+#### Calculating the order tax:
 
 ```php
 class CalculatesOrderTaxAction {
@@ -181,7 +248,7 @@ class CalculatesOrderTaxAction {
 }
 ```
 
-And finally, let's see if we need to provide free shipping:
+#### Providing free shipping (where applicable):
 
 ```php
 class ProvidesFreeShippingAction {
@@ -199,10 +266,10 @@ class ProvidesFreeShippingAction {
 }
 ```
 
-And with all that, your controller should be super simple:
+#### And finally, the controller:
 
 ```php
-class TaxController extends Contoller {
+class TaxController extends Controller {
   public function update {
     $order = Order::find(request('id'));
 

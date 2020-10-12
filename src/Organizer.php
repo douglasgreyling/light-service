@@ -27,6 +27,9 @@ trait Organizer {
 
     public function reduce(...$actions) {
         foreach ($actions as $action) {
+            if ($this->context->failure())
+                break;
+
             $this->context = $action::execute($this->context);
         }
 

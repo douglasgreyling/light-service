@@ -38,10 +38,17 @@ it('marks the context as a success when nothing goes wrong', function() {
 it('marks the context as a failure when an action fails the context', function() {
     $result = FailingOrganizer::call(0);
 
-    expect($result->to_array())->toEqual(['number' => 2]);
     expect($result->success())->toBeFalse();
     expect($result->failure())->toBeTrue();
     expect($result->message())->toEqual('foo');
+});
+
+it('stops executing remaining actions when an actions fails the context', function() {
+    $result = FailingOrganizer::call(0);
+
+    expect($result->success())->toBeFalse();
+    expect($result->failure())->toBeTrue();
+    expect($result->to_array())->toEqual(['number' => 1]);
 });
 
 it('shows the failure message when an action fails the context', function() {

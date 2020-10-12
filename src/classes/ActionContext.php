@@ -7,6 +7,7 @@ class ActionContext implements ArrayAccess {
     private $failure = false;
     private $success = true;
     private $message = '';
+    private $skip_remaining = false;
 
     public function __construct($context = []) {
         $this->context = $context;
@@ -93,5 +94,13 @@ class ActionContext implements ArrayAccess {
     public function fail_and_return($message = '') {
         $this->fail($message);
         throw new NextActionException;
+    }
+
+    public function skip_remaining() {
+        $this->skip_remaining = true;
+    }
+
+    public function must_skip_all_remaining_actions() {
+        return $this->skip_remaining;
     }
 }

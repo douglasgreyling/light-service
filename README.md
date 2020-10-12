@@ -331,3 +331,23 @@ class SubmitsOrderAction {
 Let's imagine that in the example above the organizer could have called 4 actions. The first 2 actions were executed until the 3rd action failed, and pushed the context into a failed state and so the 4th action was skipped.
 
 ![LightService](resources/failing-the-context.png)
+
+#### Skipping the rest of the actions
+
+You can skip the rest of the actions by calling `skip_remaining()` on the context. This behaves very similarly to the above-mentioned fail mechanism, except this will not push the context into a failure state. A good use case for this is executing the first couple of actions and based on a check you might not need to execute the rest. Here is an example of how you do it:
+
+```php
+class ChecksOrderStatusAction {
+  use LightServicePHP\Action;
+
+  private static function executed($context) {
+    if ($context->order->must_send_notification()) {
+      $context->skip_remaining("Everything is good, no need to execute the rest of the actions");
+    }
+  }
+}
+```
+
+Let's imagine that in the example above the organizer called 4 actions. The first 2 actions got executed successfully. The 3rd decided to skip the rest, the 4th action was not invoked. The context was successful.
+
+![LightService](resources/skip-remaining.png)

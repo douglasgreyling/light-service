@@ -5,6 +5,7 @@ require_once 'tests/fixtures/organizers/DoesNothingOrganizer.php';
 require_once 'tests/fixtures/organizers/SuccessfulOrganizer.php';
 require_once 'tests/fixtures/organizers/OneSkipOrganizer.php';
 require_once 'tests/fixtures/organizers/FailingOrganizer.php';
+require_once 'tests/fixtures/organizers/SkipRemainingOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();
@@ -55,4 +56,10 @@ it('shows the failure message when an action fails the context', function() {
     $result = FailingOrganizer::call(0);
 
     expect($result->message())->toEqual('foo');
+});
+
+it('can skip remaining action by using the skip_remaining on the context', function() {
+    $result = SkipRemainingOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 1]);
 });

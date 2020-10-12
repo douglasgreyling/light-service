@@ -151,7 +151,7 @@ it('can add an additional failure message when the context is explicitly failed'
 });
 
 it('can mark the failure flag as true and throw a NextActionException when the fail_and_return function is called', function() {
-    $context = new ActionContext([]);
+    $context = new ActionContext();
     $correct_exception_thrown = false;
 
     try {
@@ -162,4 +162,12 @@ it('can mark the failure flag as true and throw a NextActionException when the f
 
     expect($correct_exception_thrown)->toBeTrue();
     expect($context->failure())->toBeTrue();
+});
+
+it('can mark the skip_remaining flag when the skip_remaining function is called', function() {
+    $context = new ActionContext();
+
+    $context->skip_remaining();
+
+    expect($context->must_skip_all_remaining_actions())->toBeTrue();
 });

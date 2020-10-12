@@ -27,7 +27,7 @@ trait Organizer {
 
     public function reduce(...$actions) {
         foreach ($actions as $action) {
-            if ($this->context->failure())
+            if ($this->context->failure() || $this->context->must_skip_all_remaining_actions())
                 break;
 
             $this->context = $action::execute($this->context);

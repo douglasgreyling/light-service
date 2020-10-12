@@ -165,6 +165,8 @@ $result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
 if ($result->success()) {
   echo "Time to stock up on snacks!";
 }
+
+> "Time to stock up on snacks!"
 ```
 
 Because organizers generally run through complex business logic, and every action has the potential to cause a failure, testing an organizer is functionally equivalent to an integration test.

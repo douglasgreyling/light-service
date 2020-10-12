@@ -79,7 +79,7 @@ Here's a diagram to understand the relationship between organizers and actions:
 
 ![LightService](resources/lightservice-interaction.png)
 
-## Your first action
+## Your first action:
 
 Let's make a simple greeting action.
 
@@ -173,7 +173,7 @@ Because organizers generally run through complex business logic, and every actio
 
 For more complex examples, take a look at the examples folder.
 
-## Simplifying our first tax example
+## Simplifying our first tax example:
 
 Let's clean up the controller we started with by using LightService.
 
@@ -286,12 +286,48 @@ class TaxController extends Controller {
 }
 ```
 
-## Getting started
+## Requirements:
 
-### Requirements
+PHP 7.3+ is required 😅
 
-TODO
-
-### Installation
+## Installation:
 
 TODO
+
+## Tips & Tricks:
+
+### Stopping a series of actions
+
+When nothing unexpected happens during the organizer's call, the returned context will be successful. Here is how you can check for this:
+
+However, sometimes not everything will play out as you expect it. An external API call might not be available or some complex business logic will need to stop the processing of a series of actions. You have two options to stop the call chain:
+
+1. Failing the context
+2. Skipping the rest of the actions
+
+#### Failing the context:
+
+When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` method can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
+
+In case you want to fail the context and stop the execution of the executed block, use the `fail_and_return('something went wrong')` method. This will immediately fail the context and cause the execute function to return.
+
+Here's an example:
+
+```php
+class SubmitsOrderAction {
+  use LightServicePHP\Action;
+
+  private static function executed($context) {
+    if (!$context->order->submit_order_successful()) {
+      $context->fail_and_return('Failed to submit the order');
+    }
+
+    // This won't be executed
+    $context->mailer->send_order_notification();
+  }
+}
+```
+
+Let's imagine that in the example above the organizer could have called 4 actions. The first 2 actions were executed until the 3rd action failed, and pushed the context into a failed state and so the 4th action was skipped.
+
+![LightService](resources/failing-the-context.png)

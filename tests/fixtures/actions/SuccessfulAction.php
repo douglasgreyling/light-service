@@ -8,7 +8,7 @@ class SuccessfulAction {
     private $expects = ['a', 'b'];
     private $promises = ['c'];
 
-    private function executed() {
+    private function executed($context) {
         $a = $context['a'];
         $b = $context['b'];
 

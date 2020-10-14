@@ -9,11 +9,25 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
 ## Table of Content
 
 - [Why LightService?](#why-lightservice)
-- [How it works](#how-it-works)
+- [How LightService works in 60 seconds](#how-lightservice-works-in-60-seconds)
 - [Let's build something!](#lets-build-something)
-- [Getting Started](#getting-started)
+- [Getting started](#getting-started)
   - [Requirements](#requirements)
   - [Installation](#installation)
+  - [Your first action](#your-first-action)
+  - [Your first organizer](#your-first-organizer)
+- [Simplifying our first tax example](#simplifying-our-first-tax-example)
+  - [The organizer](#the-organizer)
+  - [Looking up the tax percentage](#looking-up-the-tax-percentage)
+  - [Calculating the order tax](#calculating-the-order-tax)
+  - [Providing free shipping (where applicable)](<#providing-free-shipping-(where-applicable)>)
+  - [And finally, the controller](#and-finally-the-controller)
+- [Tips & Tricks](#tips-&-tricks)
+  - [Stopping a series of actions](#stopping-a-series-of-actions)
+  - [Failing the context](#failing-the-context)
+  - [Skipping the rest of the actions](#skipping-the-rest-of-the-actions)
+  - [Hooks](#hooks)
+  - [Context Metadata](#context-metadata)
 
 ## Why LightService?
 
@@ -79,7 +93,17 @@ Here's a diagram to understand the relationship between organizers and actions:
 
 ![LightService](resources/lightservice-interaction.png)
 
-## Your first action:
+## Getting started:
+
+### Requirements:
+
+PHP 7.3+ is required 😅
+
+### Installation:
+
+TODO
+
+### Your first action:
 
 Let's make a simple greeting action.
 
@@ -116,7 +140,7 @@ if ($result->success()) {
 
 Actions try to promote simplicity. They either succeed, or they fail, and they have very clear inputs and outputs. They generally focus on doing one thing, and because of that they can be a dream to test!
 
-## Your first organizer
+### Your first organizer
 
 Most times a simple action isn't enough. LightService lets you compose a bunch of actions into a single organizer. By bundling your simple actions into an organizer you can stitch very complicated business logic together in a manner that's very easy to reason about. Good organizers tell you a clear story!
 
@@ -285,14 +309,6 @@ class TaxController extends Controller {
   }
 }
 ```
-
-## Requirements:
-
-PHP 7.3+ is required 😅
-
-## Installation:
-
-TODO
 
 ## Tips & Tricks:
 

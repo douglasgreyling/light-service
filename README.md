@@ -10,7 +10,6 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
 
 - [Why LightService?](#why-lightservice)
 - [How LightService works in 60 seconds](#how-lightservice-works-in-60-seconds)
-- [Let's build something!](#lets-build-something)
 - [Getting started](#getting-started)
   - [Requirements](#requirements)
   - [Installation](#installation)

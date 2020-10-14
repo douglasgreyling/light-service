@@ -6,6 +6,9 @@ require_once 'tests/fixtures/organizers/SuccessfulOrganizer.php';
 require_once 'tests/fixtures/organizers/OneSkipOrganizer.php';
 require_once 'tests/fixtures/organizers/FailingOrganizer.php';
 require_once 'tests/fixtures/organizers/SkipRemainingOrganizer.php';
+require_once 'tests/fixtures/organizers/BeforeAfterEachOrganizer.php';
+require_once 'tests/fixtures/organizers/AroundEachOrganizer.php';
+require_once 'tests/fixtures/organizers/AllHooksOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();
@@ -62,4 +65,22 @@ it('can skip remaining action by using the skip_remaining on the context', funct
     $result = SkipRemainingOrganizer::call(0);
 
     expect($result->to_array())->toEqual(['number' => 1]);
+});
+
+it('can execute before and after actions', function() {
+    $result = BeforeAfterEachOrganizer::call();
+
+    expect($result->to_array())->toEqual(['hooks_called' => ['before', 'after', 'before', 'after']]);
+});
+
+it('can execute around each actions', function() {
+    $result = AroundEachOrganizer::call();
+
+    expect($result->to_array())->toEqual(['hook_count' => 4]);
+});
+
+it('can execute around, before and each actions in the correct order', function() {
+    $result = AllHooksOrganizer::call();
+
+    expect($result->to_array())->toEqual(['hooks_called' => ['around', 'before', 'after', 'around', 'around', 'before', 'after', 'around']]);
 });

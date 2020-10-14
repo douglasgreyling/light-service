@@ -28,6 +28,8 @@ class ActionContext implements ArrayAccess {
     public function offsetSet($key, $value) {
         if (!is_null($key)) {
             $this->context[$key] = $value;
+        } else {
+            $this->context[$key] = $value;
         }
     }
 

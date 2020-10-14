@@ -43,7 +43,7 @@ trait Organizer {
 
         $before_decorator = \ActionHookDecorator::new(
             function() use ($organizer) { $organizer->before_each(); },
-            function() use ($action, $context) { $action::execute($context); },
+            function() use ($action, $context) { return $action::execute($context); },
             function() use ($organizer) { $organizer->after_each(); }
         );
 

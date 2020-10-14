@@ -171,3 +171,19 @@ it('can mark the skip_remaining flag when the skip_remaining function is called'
 
     expect($context->must_skip_all_remaining_actions())->toBeTrue();
 });
+
+it('can set and get the current action', function() {
+    $context = new ActionContext();
+
+    $context->set_current_action('SomeAction');
+
+    expect($context->current_action())->toEqual('SomeAction');
+});
+
+it('can set and get the current organizer', function() {
+    $context = new ActionContext();
+
+    $context->set_current_organizer('SomeOrganizer');
+
+    expect($context->current_organizer())->toEqual('SomeOrganizer');
+});

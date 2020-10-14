@@ -23,6 +23,13 @@ it('can be instantiated with an ActionContext as context', function() {
     expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
 });
 
+it('instantiates the action context with the class of the action', function() {
+    $action_context = new ActionContext();
+    $action         = new SuccessfulAction($action_context);
+
+    expect($action->context()->current_action())->toEqual(SuccessfulAction::class);
+});
+
 it('returns no context validation errors with empty expected keys', function() {
     $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 

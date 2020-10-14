@@ -21,6 +21,7 @@ trait Action {
 
     public function __construct($context) {
         $this->context = is_a($context, ActionContext::class) ? $context : new ActionContext($context);
+        $this->context->set_current_action(self::class);
     }
 
     public function run() {

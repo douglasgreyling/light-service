@@ -305,7 +305,7 @@ However, sometimes not everything will play out as you expect it. An external AP
 1. Failing the context
 2. Skipping the rest of the actions
 
-#### Failing the context:
+### Failing the context:
 
 When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` function can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
 
@@ -332,7 +332,7 @@ Let's imagine that in the example above the organizer could have called 4 action
 
 ![LightService](resources/failing-the-context.png)
 
-#### Skipping the rest of the actions
+### Skipping the rest of the actions
 
 You can skip the rest of the actions by calling `skip_remaining()` on the context. This behaves very similarly to the above-mentioned fail mechanism, except this will not push the context into a failure state. A good use case for this is executing the first couple of actions and based on a check you might not need to execute the rest. Here is an example of how you do it:
 
@@ -351,3 +351,105 @@ class ChecksOrderStatusAction {
 Let's imagine that in the example above the organizer called 4 actions. The first 2 actions got executed successfully. The 3rd decided to skip the rest, the 4th action was not invoked. The context was successful.
 
 ![LightService](resources/skip-remaining.png)
+
+### Hooks
+
+In case you need to inject code right before, after or even around actions, then hooks could be the droid you're looking for. This addition to LightService is a great way to decouple instrumentation from business logic.
+
+Consider this code:
+
+```php
+class SomeOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call($context) {
+    return self::with($context)->reduce(...$this->actions());
+  }
+
+  public static function actions() {
+    return [
+      OneAction::class,
+      TwoAction::class,
+      ThreeAction::class
+    ];
+  }
+}
+
+class TwoAction {
+  use LightServicePHP\Action;
+
+  public static function executed($context) {
+    if ($context->user->role == 'admin')
+      $context->logger->info('admin is doing something');
+
+    $context->user->do_something();
+  }
+}
+```
+
+The logging logic makes `TwoAction` more complex, there is more code for logging than for business logic.
+
+You have two options to decouple instrumentation from real logic with `before_each` and `after_each` hooks:
+
+1. Declare your hooks in the Organizer
+2. Attach hooks to the Organizer from the outside
+
+This is how you can declaratively add before and after hooks to the organizer:
+
+```php
+class SomeOrganizer {
+  use LightServicePHP\Organizer;
+
+  public function before_each($context) {
+    if ($context->current_action() == TwoAction::class) {
+      if ($context->user->role != 'admin')
+        return;
+
+      $context->logger->info('admin is doing something');
+    }
+  }
+
+  public function after_each($context) {
+    if ($context->current_action() == TwoAction::class) {
+      if ($context->user->role != 'admin')
+        return;
+
+      $context->logger->info('admin is doing something');
+    }
+  }
+
+  public static function call($context) {
+    return self::with($context)->reduce(...$this->actions());
+  }
+
+  public static function actions() {
+    return [
+      OneAction::class,
+      TwoAction::class,
+      ThreeAction::class
+    ];
+  }
+}
+
+class TwoAction {
+  use LightServicePHP\Action;
+
+  public static function executed($context) {
+    $context->user->do_something();
+  }
+}
+```
+
+Note how the action has no logging logic after this change. Also, you can target before and after action logic for specific actions, as the `$context->current_action()` will have the class name of the currently processed action. In the example above, logging will occur only for TwoAction and not for OneAction or ThreeAction.
+
+### Context Metadata
+
+The context will track some handy metadata.
+
+They include:
+
+1. The current action (`$context->current_action();`)
+2. The current organizer (`$context->current_organizer();`)
+3. The failure status of the context (`$context->failure();`)
+4. The success status of the context (`$context->success();`)
+5. The failure message if it exists (`$context->message();`)

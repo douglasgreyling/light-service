@@ -16,6 +16,7 @@ trait Organizer {
 
     public function __construct($context) {
         $this->context = new ActionContext($context);
+        $this->context->set_current_organizer(self::class);
     }
 
     public static function call() {
@@ -42,29 +43,29 @@ trait Organizer {
         $organizer = $this;
 
         $before_decorator = \ActionHookDecorator::new(
-            function() use ($organizer) { $organizer->before_each(); },
+            function() use ($organizer, $context) { $organizer->before_each($context); },
             function() use ($action, $context) { return $action::execute($context); },
-            function() use ($organizer) { $organizer->after_each(); }
+            function() use ($organizer, $context) { $organizer->after_each($context); }
         );
 
         $around_decorator = \ActionHookDecorator::new(
-            function() use ($organizer) { $organizer->around_each(); },
+            function() use ($organizer, $context) { $organizer->around_each($context); },
             $before_decorator,
-            function() use ($organizer) { $organizer->around_each(); }
+            function() use ($organizer, $context) { $organizer->around_each($context); }
         );
 
         return $around_decorator;
     }
 
-    public function around_each() {
+    public function around_each($context) {
         // no op
     }
 
-    public function before_each() {
+    public function before_each($context) {
         // no op
     }
 
-    public function after_each() {
+    public function after_each($context) {
         // no op
     }
 }

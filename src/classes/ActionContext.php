@@ -8,6 +8,8 @@ class ActionContext implements ArrayAccess {
     private $success = true;
     private $message = '';
     private $skip_remaining = false;
+    private $current_action = '';
+    private $current_organizer = '';
 
     public function __construct($context = []) {
         $this->context = $context;
@@ -104,5 +106,21 @@ class ActionContext implements ArrayAccess {
 
     public function must_skip_all_remaining_actions() {
         return $this->skip_remaining;
+    }
+
+    public function current_action() {
+        return $this->current_action;
+    }
+
+    public function set_current_action($action) {
+        $this->current_action = $action;
+    }
+
+    public function set_current_organizer($organizer) {
+        $this->current_organizer = $organizer;
+    }
+
+    public function current_organizer() {
+        return $this->current_organizer;
     }
 }

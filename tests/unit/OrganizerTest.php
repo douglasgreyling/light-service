@@ -20,6 +20,12 @@ it('instantiates an organizer with the given context when using the with functio
     expect($result->to_array())->toEqual(['a' => 1]);
 });
 
+it('instantiates the organizer context with the class of the organizer', function() {
+    $result = DoesNothingOrganizer::call(['a' => 1]);
+
+    expect($result->current_organizer())->toEqual(DoesNothingOrganizer::class);
+});
+
 it('executes all of the actions provided to it where they are applicable', function() {
     $result = SuccessfulOrganizer::call(0);
 

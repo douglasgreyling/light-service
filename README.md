@@ -27,6 +27,14 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
   - [Skipping the rest of the actions](#skipping-the-rest-of-the-actions)
   - [Hooks](#hooks)
   - [Context Metadata](#context-metadata)
+  - [Key aliases](#key-aliases)
+  - [Logging](#logging)
+  - [Error codes](#error-codes)
+  - [Action Rollback](#action-rollback)
+  - [Orchestrator Logic](#orchestrator-logic)
+  - [Context factory for faster action testing](#context-factory-for-faster-action-testing)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Why LightService?
 
@@ -468,3 +476,39 @@ They include:
 3. The failure status of the context (`$context->failure();`)
 4. The success status of the context (`$context->success();`)
 5. The failure message if it exists (`$context->message();`)
+
+### Key aliases
+
+TODO
+
+### Logging
+
+TODO
+
+### Error codes
+
+TODO
+
+### Action Rollback
+
+TODO
+
+### Orchestrator Logic
+
+TODO
+
+### Context factory for faster action testing
+
+TODO
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Added some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create new Pull Request
+
+## License
+
+LightService is released under the MIT License.

@@ -23,8 +23,6 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
   - [And finally, the controller](#and-finally-the-controller)
 - [Tips & Tricks](#tips-&-tricks)
   - [Stopping a series of actions](#stopping-a-series-of-actions)
-  - [Failing the context](#failing-the-context)
-  - [Skipping the rest of the actions](#skipping-the-rest-of-the-actions)
   - [Hooks](#hooks)
   - [Context Metadata](#context-metadata)
   - [Key aliases](#key-aliases)
@@ -328,7 +326,7 @@ However, sometimes not everything will play out as you expect it. An external AP
 1. Failing the context
 2. Skipping the rest of the actions
 
-### Failing the context:
+#### Failing the context:
 
 When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` function can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
 
@@ -355,7 +353,7 @@ Let's imagine that in the example above the organizer could have called 4 action
 
 ![LightService](resources/failing-the-context.png)
 
-### Skipping the rest of the actions
+#### Skipping the rest of the actions
 
 You can skip the rest of the actions by calling `skip_remaining()` on the context. This behaves very similarly to the above-mentioned fail mechanism, except this will not push the context into a failure state. A good use case for this is executing the first couple of actions and based on a check you might not need to execute the rest. Here is an example of how you do it:
 

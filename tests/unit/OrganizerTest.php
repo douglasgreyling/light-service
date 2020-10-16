@@ -71,6 +71,7 @@ it('can skip remaining action by using the skip_remaining on the context', funct
     $result = SkipRemainingOrganizer::call(0);
 
     expect($result->to_array())->toEqual(['number' => 1]);
+    expect($result->message())->toEqual('Skipped remaining actions');
 });
 
 it('can execute before and after actions', function() {

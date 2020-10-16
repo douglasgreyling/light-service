@@ -100,8 +100,9 @@ class ActionContext implements ArrayAccess {
         throw new NextActionException;
     }
 
-    public function skip_remaining() {
+    public function skip_remaining($message = '') {
         $this->skip_remaining = true;
+        $this->message = $message;
     }
 
     public function must_skip_all_remaining_actions() {

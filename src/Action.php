@@ -43,7 +43,11 @@ trait Action {
     }
 
     private function validate_expected_keys() {
-        $expected_keys        = isset($this->expects) ? $this->expects : [];
+        $expected_keys = [];
+
+        if (isset($this->expects))
+            $expected_keys = is_array($this->expects) ? $this->expects : [$this->expects];
+
         $expected_keys_length = count($expected_keys);
         $matched_keys         = array_keys($this->context->fetch($expected_keys));
 
@@ -52,7 +56,11 @@ trait Action {
     }
 
     private function validate_promised_keys() {
-        $promised_keys        = isset($this->promises) ? $this->promises : [];
+        $promised_keys = [];
+
+        if (isset($this->promises))
+            $promised_keys = is_array($this->promises) ? $this->promises : [$this->promises];
+
         $promised_keys_length = count($promised_keys);
         $matched_keys         = array_keys($this->context->fetch($promised_keys));
 

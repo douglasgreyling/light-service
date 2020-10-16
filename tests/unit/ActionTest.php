@@ -9,6 +9,7 @@ require_once 'tests/fixtures/actions/NoMissingPromisesAction.php';
 require_once 'tests/fixtures/actions/SuccessfulAction.php';
 require_once 'tests/fixtures/actions/UnexpectedErrorAction.php';
 require_once 'tests/fixtures/actions/FailAndReturnAction.php';
+require_once 'tests/fixtures/actions/SingleExpectsAndPromisesAction.php';
 
 it('can be instantiated with an associated array as context', function() {
     $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
@@ -34,6 +35,12 @@ it('returns no context validation errors with empty expected keys', function() {
     $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 
     expect($result->success())->toBeTrue();
+});
+
+it('can accept a single string for the expected key in the context', function() {
+    $result = SingleExpectsAndPromisesAction::execute(['a' => 1]);
+
+    expect($result->b)->toEqual(2);
 });
 
 it('throws an exception when all of the expected keys are not in the context', function() {
@@ -77,7 +84,7 @@ it('can mark the current context as failed with a message using the fail functio
     expect($result->success())->toBeFalse();
 });
 
-it('can mark the curernt context as failed and move onto the next context using the fail_and_return function', function() {
+it('can mark the current context as failed and move onto the next context using the fail_and_return function', function() {
     $result = FailAndReturnAction::execute();
 
     expect($result->failure())->toBeTrue();

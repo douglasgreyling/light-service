@@ -461,6 +461,40 @@ class TwoAction {
 
 Note how the action has no logging logic after this change. Also, you can target before and after action logic for specific actions, as the `$context->current_action()` will have the class name of the currently processed action. In the example above, logging will occur only for `TwoAction` and not for `OneAction` or `ThreeAction`.
 
+### Expects and Promises
+
+The expects and promises functions are rules for the inputs/outputs of an action. `expects` describes what keys it need to exist inside the context for the action to execute successfully, and `promises` makes sure the keys are in the context after the action is executed. If either of them are violated, a custom exception is thrown.
+
+This is how it's used:
+
+```php
+class FooAction {
+  use LightServicePHP\Action;
+
+  private expects  = ['a', 'b'];
+  private promises = ['c'];
+
+  public static function executed($context) {
+    $context['c'] = $context->a + $context->b;
+  }
+}
+```
+
+For those who are utterly slothful, you can also set the `expects` and `promises` to a single string value if you're only dealing with one key.
+
+```php
+class FooAction {
+  use LightServicePHP\Action;
+
+  private expects  = 'a';
+  private promises = 'b';
+
+  public static function executed($context) {
+    $context['b'] = $context->a + 1;
+  }
+}
+```
+
 ### Context Metadata
 
 The context will track some handy metadata.

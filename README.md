@@ -510,7 +510,7 @@ They include:
 
 ### Key aliases
 
-The `aliases` property allows you to create an alias for a key found inside the organizers contet. Actions can then access the context using the aliases.
+The `aliases` property allows you to create an alias for a key found inside the organizers context. Actions can then access the context using the aliases.
 
 This allows you to put together existing actions from different sources and have them work together without having to modify their code. Aliases will work with, or without, action expects.
 

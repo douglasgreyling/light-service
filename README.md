@@ -464,7 +464,7 @@ Note how the action has no logging logic after this change. Also, you can target
 
 ### Expects and Promises
 
-The expects and promises functions are rules for the inputs/outputs of an action. `expects` describes what keys it need to exist inside the context for the action to execute successfully, and `promises` makes sure the keys are in the context after the action is executed. If either of them are violated, a custom exception is thrown.
+The expects and promises functions are rules for the inputs/outputs of an action. `expects` describes what keys it needs to exist inside the context for the action to execute and finish successfully. `promises` makes sure the keys are in the context after the action has been executed. If either of them are violated, a custom exception is thrown.
 
 This is how it's used:
 

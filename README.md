@@ -200,8 +200,6 @@ if ($result->success()) {
 
 Because organizers generally run through complex business logic, and every action has the potential to cause a failure, testing an organizer is functionally equivalent to an integration test.
 
-For more complex examples, take a look at the examples folder.
-
 ## Simplifying our first tax example:
 
 Let's clean up the controller we started with by using LightService.

@@ -185,7 +185,7 @@ $result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
 
 And that's your first organizer! It ties two actions together through a static function `call`. The organizer call function takes any name and uses it to setup an initial context (this is what the `with` function does). The organizer then executes each of the actions on after another with the `reduce` function.
 
-As your actions are exectuted they will add/remove to the context you initially set up.
+As your actions are executed they will add/remove to the context you initially set up.
 
 Just like actions, organizers return the final context as their return value.
 

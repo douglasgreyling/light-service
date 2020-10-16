@@ -9,6 +9,7 @@ require_once 'tests/fixtures/organizers/SkipRemainingOrganizer.php';
 require_once 'tests/fixtures/organizers/BeforeAfterEachOrganizer.php';
 require_once 'tests/fixtures/organizers/AroundEachOrganizer.php';
 require_once 'tests/fixtures/organizers/AllHooksOrganizer.php';
+require_once 'tests/fixtures/organizers/KeyAliasesOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();
@@ -90,4 +91,11 @@ it('can execute around, before and each actions in the correct order', function(
     $result = AllHooksOrganizer::call();
 
     expect($result->to_array())->toEqual(['hooks_called' => ['around', 'before', 'after', 'around', 'around', 'before', 'after', 'around']]);
+});
+
+it('can set key aliases for key in the context', function() {
+    $result = KeyAliasesOrganizer::call(['a' => 1]);
+
+    expect($result->an_alias_for_a)->toEqual(1);
+    expect($result->b)->toEqual(2);
 });

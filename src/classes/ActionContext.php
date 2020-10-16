@@ -1,6 +1,6 @@
 <?php
 
-// require_once '../exceptions/NextActionException.php';
+// require_once '../exceptions/KeyAliasException.php';
 
 class ActionContext implements ArrayAccess {
     private $context = [];
@@ -10,6 +10,7 @@ class ActionContext implements ArrayAccess {
     private $skip_remaining = false;
     private $current_action = '';
     private $current_organizer = '';
+    private $key_aliases = [];
 
     public function __construct($context = []) {
         $this->context = $context;
@@ -44,7 +45,7 @@ class ActionContext implements ArrayAccess {
     }
 
     public function offsetGet($key) {
-        return isset($this->context[$key]) ? $this->context[$key] : null;
+        return $this->get($key);
     }
 
     public function set($key, $value) {
@@ -52,11 +53,25 @@ class ActionContext implements ArrayAccess {
     }
 
     public function get($key) {
-        return isset($this->context[$key]) ? $this->context[$key] : null;
+        if (isset($this->context[$key]))
+            return $this->context[$key];
+
+        $key_alias = array_search($key, $this->key_aliases);
+
+        if (isset($this->context[$key_alias]))
+            return $this->context[$key_alias];
+
+        return null;
     }
 
     public function fetch($keys) {
-        return array_intersect_key($this->to_array(), array_flip($keys));
+        $context = $this->to_array();
+
+        foreach($this->key_aliases as $key => $key_alias) {
+            $context[$key_alias] = $this->context[$key];
+        }
+
+        return array_intersect_key($context, array_flip($keys));
     }
 
     public function __get($key) {
@@ -123,5 +138,18 @@ class ActionContext implements ArrayAccess {
 
     public function current_organizer() {
         return $this->current_organizer;
+    }
+
+    public function set_key_aliases($aliases) {
+        $clashing_key_aliases = array_keys(array_intersect(array_keys($this->context), array_values($aliases)));
+
+        if (0 < count($clashing_key_aliases))
+            throw new KeyAliasException(join(', ', $clashing_key_aliases));
+
+        $this->key_aliases = $aliases;
+    }
+
+    public function key_aliases() {
+        return $this->key_aliases;
     }
 }

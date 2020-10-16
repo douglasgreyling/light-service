@@ -52,7 +52,7 @@ trait Action {
         $matched_keys         = array_keys($this->context->fetch($expected_keys));
 
         if ($expected_keys_length != count($matched_keys))
-        throw new ExpectedKeysNotInContextException(join(', ', array_diff($expected_keys, $matched_keys)));
+            throw new ExpectedKeysNotInContextException(join(', ', array_diff($expected_keys, $matched_keys)));
     }
 
     private function validate_promised_keys() {
@@ -65,7 +65,7 @@ trait Action {
         $matched_keys         = array_keys($this->context->fetch($promised_keys));
 
         if ($promised_keys_length != count($matched_keys))
-        throw new PromisedKeysNotInContextException(join(', ', array_diff($promised_keys, $matched_keys)));
+            throw new PromisedKeysNotInContextException(join(', ', array_diff($promised_keys, $matched_keys)));
     }
 
     public function context() {

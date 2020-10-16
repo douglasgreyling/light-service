@@ -2,6 +2,7 @@
 
 require_once 'src/classes/ActionContext.php';
 require_once 'src/exceptions/NextActionException.php';
+require_once 'src/exceptions/KeyAliasException.php';
 
 it('is instantiated with an empty context when given no state', function() {
     $context = new ActionContext();
@@ -187,3 +188,15 @@ it('can set and get the current organizer', function() {
 
     expect($context->current_organizer())->toEqual('SomeOrganizer');
 });
+
+it('can fetch a key by an alias', function() {
+    $context = new ActionContext(['a' => 'value']);
+    $context->set_key_aliases(['a' => 'an_alias_for_a']);
+
+    expect($context->an_alias_for_a)->toEqual('value');
+});
+
+it('throws an exception when a key alias is defined for a key which is already inside the context', function() {
+    $context = new ActionContext(['a' => 'value', 'an_alias_for_a' => 'some other value']);
+    $context->set_key_aliases(['a' => 'an_alias_for_a']);
+})->throws(KeyAliasException::class);

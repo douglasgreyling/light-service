@@ -10,6 +10,7 @@ require_once 'tests/fixtures/actions/SuccessfulAction.php';
 require_once 'tests/fixtures/actions/UnexpectedErrorAction.php';
 require_once 'tests/fixtures/actions/FailAndReturnAction.php';
 require_once 'tests/fixtures/actions/SingleExpectsAndPromisesAction.php';
+require_once 'tests/fixtures/actions/KeyAliasesAction.php';
 
 it('can be instantiated with an associated array as context', function() {
     $action = new SuccessfulAction(['a' => 1, 'b' => 2]);

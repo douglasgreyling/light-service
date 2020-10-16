@@ -17,6 +17,7 @@ trait Organizer {
     public function __construct($context) {
         $this->context = new ActionContext($context);
         $this->context->set_current_organizer(self::class);
+        $this->context->set_key_aliases($this->key_aliases());
     }
 
     public static function call() {
@@ -67,5 +68,9 @@ trait Organizer {
 
     public function after_each($context) {
         // no op
+    }
+
+    private function key_aliases() {
+        return isset($this->aliases) ? $this->aliases : [];
     }
 }

@@ -29,19 +29,22 @@ class ActionContext implements ArrayAccess {
     }
 
     public function offsetSet($key, $value) {
-        if (!is_null($key)) {
-            $this->context[$key] = $value;
-        } else {
-            $this->context[$key] = $value;
-        }
+        if (!is_null($key))
+            $this->set($key, $value);
     }
 
     public function offsetExists($key) {
-        return isset($this->context[$key]);
+        $flipped_key_aliases = array_flip($this->key_aliases);
+        $actual_key          = isset($flipped_key_aliases[$key]) ? $flipped_key_aliases[$key] : $key;
+
+        return isset($this->context[$actual_key]);
     }
 
     public function offsetUnset($key) {
-        unset($this->context[$key]);
+        $flipped_key_aliases = array_flip($this->key_aliases);
+        $actual_key          = isset($flipped_key_aliases[$key]) ? $flipped_key_aliases[$key] : $key;
+
+        unset($this->context[$actual_key]);
     }
 
     public function offsetGet($key) {
@@ -49,7 +52,10 @@ class ActionContext implements ArrayAccess {
     }
 
     public function set($key, $value) {
-        $this->context[$key] = $value;
+        $flipped_key_aliases = array_flip($this->key_aliases);
+        $actual_key          = isset($flipped_key_aliases[$key]) ? $flipped_key_aliases[$key] : $key;
+
+        $this->context[$actual_key] = $value;
     }
 
     public function get($key) {
@@ -79,7 +85,7 @@ class ActionContext implements ArrayAccess {
     }
 
     public function __set($key, $value) {
-        $this->context[$key] = $value;
+        $this->set($key, $value);
     }
 
     public function keys() {

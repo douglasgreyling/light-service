@@ -24,6 +24,7 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
 - [Tips & Tricks](#tips-&-tricks)
   - [Stopping a series of actions](#stopping-a-series-of-actions)
   - [Hooks](#hooks)
+  - [Expects and promises](#expects-and-promises)
   - [Context Metadata](#context-metadata)
   - [Key aliases](#key-aliases)
   - [Logging](#logging)
@@ -509,7 +510,48 @@ They include:
 
 ### Key aliases
 
-TODO
+The `aliases` property allows you to create an alias for a key found inside the organizers contet. Actions can then access the context using the aliases.
+
+This allows you to put together existing actions from different sources and have them work together without having to modify their code. Aliases will work with, or without, action expects.
+
+If a key alias is set for a key which already exists inside the context, then an exception is raised.
+
+Say for example you have actions `AnAction` and `AnotherAction` that you've used in previous projects. `AnAction` provides `my_key` but `AnotherAction` needs to use that key but expects it to be called `key_alias` instead. You can use them together in an organizer like so:
+
+```php
+class AnOrganizer {
+  use LightServicePHP\Organizer;
+
+  private $aliases = ['my_key' => 'key_alias'];
+
+  public static function call($order) {
+    return self::with(['order' => $order])->reduce(
+      AnAction::class,
+      AnotherAction::class,
+    );
+  }
+}
+
+class AnAction {
+  use LightServicePHP\Action;
+
+  private $promises = 'my_key';
+
+  private function executed($context) {
+    $context->my_key = "value";
+  }
+}
+
+class AnotherAction {
+  use LightServicePHP\Action;
+
+  private $expects = 'key_alias';
+
+  private function executed($context) {
+    $context->key_alias;
+  }
+}
+```
 
 ### Logging
 

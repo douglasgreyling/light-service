@@ -94,8 +94,9 @@ it('can execute around, before and each actions in the correct order', function(
 });
 
 it('can set key aliases for key in the context', function() {
-    $result = KeyAliasesOrganizer::call(['a' => 1]);
+    $result = KeyAliasesOrganizer::call(1);
 
-    expect($result->an_alias_for_a)->toEqual(1);
-    expect($result->b)->toEqual(2);
+    expect($result->num_alias)->toEqual(3);
+    expect($result->number)->toEqual(3);
+    expect($result->to_array())->toEqual(['number' => 3]);
 });

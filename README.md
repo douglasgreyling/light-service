@@ -25,12 +25,12 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
   - [Stopping a series of actions](#stopping-a-series-of-actions)
   - [Hooks](#hooks)
   - [Expects and promises](#expects-and-promises)
-  - [Context Metadata](#context-metadata)
+  - [Context metadata](#context-metadata)
   - [Key aliases](#key-aliases)
   - [Logging](#logging)
   - [Error codes](#error-codes)
-  - [Action Rollback](#action-rollback)
-  - [Orchestrator Logic](#orchestrator-logic)
+  - [Action rollback](#action-rollback)
+  - [Orchestrator logic](#orchestrator-logic)
   - [Context factory for faster action testing](#context-factory-for-faster-action-testing)
 - [Contributing](#contributing)
 - [License](#license)
@@ -462,7 +462,7 @@ class TwoAction {
 
 Note how the action has no logging logic after this change. Also, you can target before and after action logic for specific actions, as the `$context->current_action()` will have the class name of the currently processed action. In the example above, logging will occur only for `TwoAction` and not for `OneAction` or `ThreeAction`.
 
-### Expects and Promises
+### Expects and promises
 
 The expects and promises functions are rules for the inputs/outputs of an action. `expects` describes what keys it needs to exist inside the context for the action to execute and finish successfully. `promises` makes sure the keys are in the context after the action has been executed. If either of them are violated, a custom exception is thrown.
 
@@ -496,7 +496,7 @@ class FooAction {
 }
 ```
 
-### Context Metadata
+### Context metadata
 
 The context will track some handy metadata.
 
@@ -561,11 +561,11 @@ TODO
 
 TODO
 
-### Action Rollback
+### Action rollback
 
 TODO
 
-### Orchestrator Logic
+### Orchestrator logic
 
 TODO
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'src/classes/ActionContext.php';
+require_once 'src/ActionContext.php';
 require_once 'src/exceptions/NextActionException.php';
 require_once 'src/exceptions/KeyAliasException.php';
 

@@ -2,7 +2,7 @@
 
 namespace LightServicePHP;
 
-require_once 'classes/ActionContext.php';
+require_once 'ActionContext.php';
 require_once 'ActionHookDecorator.php';
 
 require_once 'exceptions/NotImplementedException.php';

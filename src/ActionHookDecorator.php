@@ -1,11 +1,11 @@
 <?php
 
 class ActionHookDecorator {
-    public static function new($beforeCallback, $function, $afterCallback) {
-        return function() use ($beforeCallback, $function, $afterCallback) {
-            $beforeCallback();
-            $result = $function();
-            $afterCallback();
+    public static function decorate($before_callback, $action_callback, $after_callback) {
+        return function() use ($before_callback, $action_callback, $after_callback) {
+            $before_callback();
+            $result = $action_callback();
+            $after_callback();
 
             return $result;
         };

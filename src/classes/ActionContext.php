@@ -7,6 +7,7 @@ class ActionContext implements ArrayAccess {
     private $failure = false;
     private $success = true;
     private $message = '';
+    private $error_code = '';
     private $skip_remaining = false;
     private $current_action = '';
     private $current_organizer = '';
@@ -110,14 +111,15 @@ class ActionContext implements ArrayAccess {
         return $this->context;
     }
 
-    public function fail($message = '') {
-        $this->failure = true;
-        $this->success = false;
-        $this->message = $message;
+    public function fail($message = '', $error_code = '') {
+        $this->failure    = true;
+        $this->success    = false;
+        $this->message    = $message;
+        $this->error_code = $error_code;
     }
 
-    public function fail_and_return($message = '') {
-        $this->fail($message);
+    public function fail_and_return($message = '', $error_code = '') {
+        $this->fail($message, $error_code);
         throw new NextActionException;
     }
 
@@ -157,5 +159,9 @@ class ActionContext implements ArrayAccess {
 
     public function key_aliases() {
         return $this->key_aliases;
+    }
+
+    public function error_code() {
+        return $this->error_code;
     }
 }

@@ -200,3 +200,28 @@ it('throws an exception when a key alias is defined for a key which is already i
     $context = new ActionContext(['a' => 'value', 'an_alias_for_a' => 'some other value']);
     $context->set_key_aliases(['a' => 'an_alias_for_a']);
 })->throws(KeyAliasException::class);
+
+it('can fail a context with an error code', function() {
+    $context = new ActionContext();
+
+    $context->fail('Something went wrong', 4001);
+
+    expect($context->message())->toEqual('Something went wrong');
+    expect($context->error_code())->toEqual(4001);
+});
+
+it('can fail a context and skip to the next action with an error code', function() {
+    $context = new ActionContext();
+    $correct_exception_thrown = false;
+
+    try {
+        $context->fail_and_return('Something went wrong', 4001);
+    } catch (NextActionException $e) {
+        $correct_exception_thrown = true;
+    }
+
+    expect($correct_exception_thrown)->toBeTrue();
+    expect($context->failure())->toBeTrue();
+    expect($context->message())->toEqual('Something went wrong');
+    expect($context->error_code())->toEqual(4001);
+});

@@ -559,7 +559,47 @@ TODO
 
 ### Error codes
 
-TODO
+You can add some more structure to your error handling by taking advantage of error codes in the context. Normally, when something goes wrong in your actions, you fail the process by setting the context to failure:
+
+```php
+class SomeAction {
+  use LightServicePHP\Action;
+
+  private function executed($context) {
+    $context->fail("I don't like what happened here.");
+  }
+}
+```
+
+However, you might need to handle the errors coming from your action pipeline differently. Using an error code can help you check what type of expected error occurred in the organizer, or in the actions.
+
+```php
+class SomeAction {
+  use LightServicePHP\Action;
+
+  private function executed($context) {
+    if (95 < $context->teapot->heat())
+      $context->fail("The teapot is not hot enough", 1234);
+
+    # Make some tea
+
+    if (2 < $context->sugar->amount())
+      $context->fail("There is not enough sugar for the tea", 5678);
+  }
+}
+```
+
+If this action were executed, then you can pull the error message like you would normally, but you can also retrieve the error code.
+
+```php
+$result = SomeAction::execute();
+
+echo $result->message();
+> "The teapost is not hot enough"
+
+echo $result->error_code();
+> 1234
+```
 
 ### Action rollback
 

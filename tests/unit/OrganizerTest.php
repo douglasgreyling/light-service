@@ -93,10 +93,8 @@ it('can execute around, before and each actions in the correct order', function(
     expect($result->to_array())->toEqual(['hooks_called' => ['around', 'before', 'after', 'around', 'around', 'before', 'after', 'around']]);
 });
 
-it('can set key aliases for key in the context', function() {
+it('can use set key aliases for keys in the context', function() {
     $result = KeyAliasesOrganizer::call(1);
 
-    expect($result->num_alias)->toEqual(3);
-    expect($result->number)->toEqual(3);
-    expect($result->to_array())->toEqual(['number' => 3]);
+    expect($result->to_array())->toEqual(['number' => 4]);
 });

@@ -8,12 +8,12 @@ class NoMissingPromisesAction {
     private $expects = ['a', 'b'];
 
     private function executed($context) {
-        $a = $context['a'];
-        $b = $context['b'];
+        $a = $context->a;
+        $b = $context->b;
 
         $c = $this->adds($a, $b);
 
-        $context['c'] = $c;
+        $context->c = $c;
     }
 
     private function adds($a, $b) {

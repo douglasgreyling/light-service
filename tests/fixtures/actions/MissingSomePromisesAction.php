@@ -5,12 +5,12 @@ require_once 'src/Action.php';
 class MissingSomePromisesAction {
     use LightServicePHP\Action;
 
-    private $expects = ['a', 'b'];
+    private $expects  = ['a', 'b'];
     private $promises = ['c', 'd'];
 
     private function executed($context) {
-        $a = $context['a'];
-        $b = $context['b'];
+        $a = $context->a;
+        $b = $context->b;
 
         $c = $this->adds($a, $b);
 

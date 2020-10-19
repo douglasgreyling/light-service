@@ -12,7 +12,8 @@ class KeyAliasesOrganizer {
     public static function call($number) {
         return self::with(['number' => $number])->reduce(
             AddsOneAction::class,
-            KeyAliasesAction::class
+            KeyAliasesAction::class,
+            AddsOneAction::class
         );
     }
 }

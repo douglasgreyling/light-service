@@ -18,15 +18,15 @@ it('can be instantiated with an associated array as context', function() {
     expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
 });
 
-it('can be instantiated with an ActionContext as context', function() {
-    $action_context = new ActionContext(['a' => 1, 'b' => 2]);
+it('can be instantiated with an Context as context', function() {
+    $action_context = new Context(['a' => 1, 'b' => 2]);
     $action         = new SuccessfulAction($action_context);
 
     expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
 });
 
 it('instantiates the action context with the class of the action', function() {
-    $action_context = new ActionContext();
+    $action_context = new Context();
     $action         = new SuccessfulAction($action_context);
 
     expect($action->context()->current_action())->toEqual(SuccessfulAction::class);
@@ -90,4 +90,16 @@ it('can mark the current context as failed and move onto the next context using 
 
     expect($result->failure())->toBeTrue();
     expect($result->keys())->not()->toHaveKey('one');
+});
+
+it('can get the current context', function() {
+    $action = new SuccessfulAction(['a' => 1]);
+
+    expect($action->context()->to_array())->toEqual(['a' => 1]);
+});
+
+it('can get the expected keys', function() {
+    $action = new SuccessfulAction(['a' => 1]);
+
+    expect($action->expected_keys())->toEqual(['a', 'b']);
 });

@@ -630,7 +630,7 @@ class CallSomeExternalAPI {
   private function executed($context) {
     $api_call_result = SomeAPI::save_user($context->user);
 
-    if ($api_call_result->failure?)
+    if ($api_call_result->failure)
       $context->fail_with_rollback("Error when calling external API");
   }
 }

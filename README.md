@@ -476,7 +476,7 @@ class FooAction {
   private promises = ['c'];
 
   public static function executed($context) {
-    $context['c'] = $context->a + $context->b;
+    $context->c = $context->a + $context->b;
   }
 }
 ```
@@ -491,7 +491,7 @@ class FooAction {
   private promises = 'b';
 
   public static function executed($context) {
-    $context['b'] = $context->a + 1;
+    $context->b = $context->a + 1;
   }
 }
 ```

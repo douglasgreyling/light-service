@@ -8,6 +8,7 @@ require_once 'exceptions/ExpectedKeysNotInContextException.php';
 require_once 'exceptions/NextActionException.php';
 require_once 'exceptions/NotImplementedException.php';
 require_once 'exceptions/PromisedKeysNotInContextException.php';
+require_once 'exceptions/RollbackException.php';
 
 use Context;
 
@@ -15,6 +16,7 @@ use ExpectedKeysNotInContextException;
 use NextActionException;
 use NotImplementedException;
 use PromisedKeysNotInContextException;
+use RollbackException;
 
 trait Action {
     private $context;
@@ -29,13 +31,25 @@ trait Action {
             $this->validate_expected_keys();
             $this->executed($this->context);
             $this->validate_promised_keys();
-        } catch (NextActionException $e) {}
+        } catch (NextActionException $e) {
+            // no op
+        }
+        catch (RollbackException $e) {
+            $this->rolled_back($this->context);
+        }
 
         return $this->context;
     }
 
     public static function execute($context = []) {
         return (new self($context))->run();
+    }
+
+    public static function rollback($context = []) {
+        $action = new self($context);
+        $action->rolled_back($action->context());
+
+        return $action->context();
     }
 
     public function context() {
@@ -53,6 +67,10 @@ trait Action {
 
     private function executed($context) {
         throw new NotImplementedException();
+    }
+
+    private function rolled_back($context) {
+        // no op
     }
 
     private function validate_expected_keys() {

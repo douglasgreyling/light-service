@@ -2,14 +2,14 @@
 
 require_once 'src/Action.php';
 
-class AddsOneAction {
+class RollbackAction {
     use LightServicePHP\Action;
 
     private $expects  = ['number'];
     private $promises = ['number'];
 
     private function executed($context) {
-        $context->number += 1;
+        $context->fail_with_rollback('I want to roll back!');
     }
 
     private function rolled_back($context) {

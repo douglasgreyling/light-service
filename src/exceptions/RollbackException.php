@@ -2,6 +2,6 @@
 
 require_once 'src/exceptions/ContextException.php';
 
-class NextActionException extends ContextException {
+class RollbackException extends ContextException {
     //
 }

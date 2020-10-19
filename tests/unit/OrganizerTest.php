@@ -10,6 +10,7 @@ require_once 'tests/fixtures/organizers/BeforeAfterEachOrganizer.php';
 require_once 'tests/fixtures/organizers/AroundEachOrganizer.php';
 require_once 'tests/fixtures/organizers/AllHooksOrganizer.php';
 require_once 'tests/fixtures/organizers/KeyAliasesOrganizer.php';
+require_once 'tests/fixtures/organizers/RollbackOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();
@@ -97,4 +98,11 @@ it('can use set key aliases for keys in the context', function() {
     $result = KeyAliasesOrganizer::call(1);
 
     expect($result->to_array())->toEqual(['number' => 4]);
+});
+
+it('can rollback a set of actions', function() {
+    $result = RollbackOrganizer::call(1);
+
+    expect($result->to_array())->toEqual(['number' => 0]);
+    expect($result->message())->toEqual('I want to roll back!');
 });

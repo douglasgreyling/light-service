@@ -7,6 +7,7 @@ class ContextMetadata {
         'message'           => '',
         'error_code'        => '',
         'skip_remaining'    => false,
+        'rollback'          => false,
         'current_action'    => '',
         'current_organizer' => '',
         'key_aliases'       => []

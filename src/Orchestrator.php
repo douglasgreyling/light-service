@@ -1,6 +1,7 @@
 <?php
 
 require_once 'ActionHookWrapper.php';
+require_once 'src/exceptions/RollbackException.php';
 
 class Orchestrator {
     private $actions;
@@ -14,26 +15,39 @@ class Orchestrator {
     }
 
     public function run() {
-        foreach ($this->actions as $action) {
-            if ($this->fail_or_skip_all_remaining_actions())
-                break;
+        try {
+            foreach ($this->actions as $action) {
+                if ($this->fail_skip_or_rollback())
+                    break;
 
-            $action              = new $action();
-            $expects_key_aliases = $this->expects_key_aliases($action);
+                $action_instance     = new $action();
+                $expects_key_aliases = $this->expects_key_aliases($action_instance);
 
-            if ($expects_key_aliases)
-                $this->organizer->context->use_aliases($this->organizer->key_aliases());
+                if ($expects_key_aliases)
+                    $this->organizer->context->use_aliases($this->organizer->key_aliases());
 
-            $this->context = $this->wrap_hooks($action)();
+                $this->context = $this->wrap_hooks($action)();
 
-            if ($expects_key_aliases)
-                $this->context->use_aliases(array_flip($this->organizer->key_aliases()));
+                if ($expects_key_aliases)
+                    $this->context->use_aliases(array_flip($this->organizer->key_aliases()));
+            }
+        } catch (RollbackException $e) {
+            $last_action         = $this->context->current_action();
+            $index               = array_search($last_action, $this->actions);
+            $actions_to_rollback = array_reverse(array_slice($this->actions, 0, $index));
+
+            foreach($actions_to_rollback as $action)
+                $this->context = $action::rollback($this->context);
         }
 
         return $this->context;
     }
 
-    private function fail_or_skip_all_remaining_actions() {
+    private function fail_skip_or_rollback() {
+        if ($this->context->_metadata->rollback) {
+            throw new RollbackException;
+        }
+
         return (
             $this->context->failure() ||
             $this->context->must_skip_all_remaining_actions()

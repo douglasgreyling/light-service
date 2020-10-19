@@ -1,5 +1,6 @@
 <?php
 
+require_once 'src/exceptions/RollbackException.php';
 require_once 'ContextMetadata.php';
 
 class Context extends stdClass {
@@ -78,6 +79,12 @@ class Context extends stdClass {
     public function fail_and_return($message = '', $error_code = '') {
         $this->fail($message, $error_code);
         throw new NextActionException;
+    }
+
+    public function fail_with_rollback($message = '', $error_code = '') {
+        $this->fail($message, $error_code);
+        $this->_metadata->rollback = true;
+        throw new RollbackException;
     }
 
     public function skip_remaining($message = '') {

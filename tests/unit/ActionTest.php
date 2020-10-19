@@ -103,3 +103,16 @@ it('can get the expected keys', function() {
 
     expect($action->expected_keys())->toEqual(['a', 'b']);
 });
+
+it('can fail the context and rollback', function() {
+    $result = RollbackAction::execute(['number' => 1]);
+
+    expect($result->to_array())->toEqual(['number' => 0]);
+    expect($result->message())->toEqual('I want to roll back!');
+});
+
+it('can fail the context and rollback statically with a given context', function() {
+    $result = RollbackAction::rollback(['number' => 1]);
+
+    expect($result->to_array())->toEqual(['number' => 0]);
+});

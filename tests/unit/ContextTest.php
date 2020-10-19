@@ -51,7 +51,8 @@ it('can convert itself to an array including its metadata', function() {
             'skip_remaining'    => false,
             'current_action'    => '',
             'current_organizer' => '',
-            'key_aliases'       => []
+            'key_aliases'       => [],
+            'rollback'          => false
         ]
     ]);
 });

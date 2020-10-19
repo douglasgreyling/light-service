@@ -603,7 +603,42 @@ echo $result->error_code();
 
 ### Action rollback
 
-TODO
+Sometimes your action has to undo what it did when an error occurs. Think about a chain of actions where you need to persist records in your data store in one action and you have to call an external service in the next. What happens if there is an error when you call the external service? You want to remove the records you previously saved. You can do it now with the `rolled_back` function.
+
+```php
+class SaveEntities {
+  use LightServicePHP\Action;
+
+  private $expects = 'user';
+
+  private function executed($context) {
+    $context->user->save();
+  }
+
+  private function rolled_back($executed) {
+    $context->user->destroy();
+  }
+}
+```
+
+You need to call the `fail_with_rollback` function to initiate a rollback for actions starting with the action where the failure was triggered.
+
+```php
+class CallSomeExternalAPI {
+  use LightServicePHP\Action;
+
+  private function executed($context) {
+    $api_call_result = SomeAPI::save_user($context->user);
+
+    if ($api_call_result->failure?)
+      $context->fail_with_rollback("Error when calling external API");
+  }
+}
+```
+
+Using the `rolled_back` function is optional for the actions in the chain. You shouldn't care about undoing non-persisted changes.
+
+The actions are rolled back in reversed order from the point of failure starting with the action that triggered it.
 
 ### Orchestrator logic
 

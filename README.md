@@ -642,7 +642,186 @@ The actions are rolled back in reversed order from the point of failure starting
 
 ### Orchestrator logic
 
-TODO
+The Organizer - Action combination works really well for simple use cases. However, as business logic gets more complex, or when LightService is used in an ETL workflow, the code that routes the different organizers becomes very complex and imperative. Let's look at a piece of code that does basic data transformations:
+
+```php
+class ExtractsTransformsLoadsData {
+  public static function run($connection) {
+    $context = RetrievesConnectionInfo::call($connection);
+    $context = PullsDataFromRemoteApi::call($context);
+
+    $retrieved_items = $context->retrieved_items;
+
+    if ($retrieved_items->empty)
+      NotifiesEngineeringTeamAction::execute($context);
+
+    foreach($retrieved_items as $item) {
+      $context->item = $item;
+      TransformsData::call($context);
+    }
+
+    $context = LoadsData::call($context);
+
+    return SendsNotifications::call($context);
+  }
+}
+```
+
+The LightService::Context is initialized with the first action, that context is passed around among organizers and actions. This code is still simpler than many out there, but it feels very imperative: it has conditionals and iterators in it.
+
+Let's see how we could make it a bit more simpler with a declarative style:
+
+```php
+class ExtractsTransformsLoadsData {
+  use LightServicePHP\Organizer;
+
+  public static function call($connection) {
+    return self::with(['connection' => $connection])->reduce(...self::actions());
+  }
+
+  public static function actions() {
+    return [
+      RetrievesConnectionInfo::class,
+      PullsDataFromRemoteApi::class,
+      self::reduce_if(
+        function($context) {
+          return array_empty($context->retrieved_items);
+        },
+        [ NotifiesEngineeringTeamAction::class ]
+      ),
+      self::iterate('retrieved_items', [ TransformsData::class ]),
+      LoadsData::class,
+      SendsNotifications::class
+    ];
+  }
+}
+```
+
+This code is much easier to reason about, it's less noisy and it captures the goal of LightService well: simple, declarative code that's easy to understand.
+
+The 5 different orchestrator constructs an organizer can have:
+
+#### 1. `reduce_until`
+
+`reduce_until` behaves like a while loop in imperative languages, it iterates until the provided predicate in the callback function evaluates to true.
+
+```php
+class ReduceUntilOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call($number) {
+    return self::with(['number' => $number])->reduce(
+      AddsOneAction::class,
+      self::reduce_until(
+        function($context) {
+          return 3 < $context->number;
+        },
+        [ AddsOneAction::class ]
+      )
+    );
+  }
+}
+```
+
+In this case the organizer above takes a number, executes a couple of actions before reducing an array of actions (in this case only containing the `AddsOneAction`) until the number in the context is greater than 3.
+
+#### 2. `reduce_if`
+
+`reduce_if` will reduce the included actions if the predicate in the callback function evaluates to true.
+
+```php
+class ReduceIfOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call($number) {
+    return self::with(['number' => $number])->reduce(
+      AddsOneAction::class,
+      self::reduce_if(
+        function($context) {
+          return 1 < $context->number;
+        },
+        [ AddsOneAction::class ]
+      ),
+      AddsOneAction::class
+    );
+  }
+}
+```
+
+In this case the organizer above takes a number, executes a couple of actions before reducing an array of actions (in this case only containing the `AddsOneAction`) if the number in the context is greater than 1.
+
+#### 3. `iterate`
+
+`iterate` gives you iteration logic based on a string which exists as a key inside the context otherwise it will fail.
+
+The organizer will singularize the key name and will put the actual item into the context under that name. Each element will be accessible by the singlular itme name for the actions in the iterate actions.
+
+```php
+class IterateOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call($context) {
+    return self::with($context)->reduce(
+      self::iterate('numbers', [
+        IterateAction::class,
+      ])
+    );
+  }
+}
+
+class IterateAction {
+  use LightServicePHP\Action;
+
+  private $expects  = ['number'];
+  private $promises = ['number'];
+
+  private function executed($context) {
+    $context->sum += $context->number;
+  }
+}
+```
+
+In this case the organizer above takes a collection of numbers and sums all the numbers together by iterating through them all.
+
+#### 4. `execute`
+
+To take advantage of another organizer or action, you might need to tweak the context a bit. Let's say you have an array, and you need to iterate over its values in a series of actions. To alter the context and have the values assigned into a variable, you need to create a new action with 1 line of code in it.
+
+That seems a lot of ceremony for a simple change. You can do that in an `execute` function like this:
+
+```php
+class ExecuteOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call($number) {
+    return self::with(['number' => $number])->reduce(
+      AddsOneAction::class,
+      self::execute(function($context) { $context->number += 1; })
+    );
+  }
+}
+```
+
+In this case the organizer above simply changes the context in some way defined within the `execute` functions callback.
+
+#### 5. `add_to_context`
+
+`add_to_context` can add key-value pairs on the fly to the context. This functionality is useful when you need a value injected into the context under a specific key right before the subsequent actions are executed.
+
+```php
+class AddToContextOrganizer {
+  use LightServicePHP\Organizer;
+
+  public static function call() {
+    return self::with([])->reduce(
+      self::add_to_context(['number' => 0]),
+      AddsOneAction::class
+    );
+  }
+}
+```
+
+In this case the organizer above adds some kv's into the context which the `AddsOneAction` needs in order to function correctly.
 
 ### Context factory for faster action testing
 
@@ -651,10 +830,11 @@ TODO
 ## Contributing
 
 1. Fork it
-2. Create your feature branch (git checkout -b my-new-feature)
-3. Commit your changes (git commit -am 'Added some feature')
-4. Push to the branch (git push origin my-new-feature)
-5. Create new Pull Request
+2. Try keep your commits semantic [like this](https://seesparkbox.com/foundry/semantic_commit_messages).
+3. Create your feature branch (git checkout -b my-new-feature)
+4. Commit your changes (git commit -am 'Added some feature')
+5. Push to the branch (git push origin my-new-feature)
+6. Create new Pull Request
 
 ## License
 

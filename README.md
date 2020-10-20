@@ -337,7 +337,7 @@ Here's an example:
 class SubmitsOrderAction {
   use LightServicePHP\Action;
 
-  private static function executed($context) {
+  private function executed($context) {
     if (!$context->order->submit_order_successful()) {
       $context->fail_and_return('Failed to submit the order');
     }
@@ -360,7 +360,7 @@ You can skip the rest of the actions by calling `skip_remaining()` on the contex
 class ChecksOrderStatusAction {
   use LightServicePHP\Action;
 
-  private static function executed($context) {
+  private function executed($context) {
     if ($context->order->must_send_notification()) {
       $context->skip_remaining("Everything is good, no need to execute the rest of the actions");
     }
@@ -383,7 +383,7 @@ class SomeOrganizer {
   use LightServicePHP\Organizer;
 
   public static function call($context) {
-    return self::with($context)->reduce(...$this->actions());
+    return self::with($context)->reduce(...self::actions());
   }
 
   public static function actions() {
@@ -398,7 +398,7 @@ class SomeOrganizer {
 class TwoAction {
   use LightServicePHP\Action;
 
-  public static function executed($context) {
+  private function executed($context) {
     if ($context->user->role == 'admin')
       $context->logger->info('admin is doing something');
 
@@ -439,7 +439,7 @@ class SomeOrganizer {
   }
 
   public static function call($context) {
-    return self::with($context)->reduce(...$this->actions());
+    return self::with($context)->reduce(...self::actions());
   }
 
   public static function actions() {
@@ -454,7 +454,7 @@ class SomeOrganizer {
 class TwoAction {
   use LightServicePHP\Action;
 
-  public static function executed($context) {
+  private function executed($context) {
     $context->user->do_something();
   }
 }
@@ -475,7 +475,7 @@ class FooAction {
   private expects  = ['a', 'b'];
   private promises = ['c'];
 
-  public static function executed($context) {
+  private function executed($context) {
     $context->c = $context->a + $context->b;
   }
 }
@@ -490,7 +490,7 @@ class FooAction {
   private expects  = 'a';
   private promises = 'b';
 
-  public static function executed($context) {
+  private function executed($context) {
     $context->b = $context->a + 1;
   }
 }

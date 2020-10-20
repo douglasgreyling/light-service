@@ -4,5 +4,8 @@
     "pestphp/pest": "^0.3.8"
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "require": {
+    "doctrine/inflector": "^2.0"
+  }
 }

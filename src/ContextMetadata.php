@@ -10,7 +10,8 @@ class ContextMetadata {
         'rollback'          => false,
         'current_action'    => '',
         'current_organizer' => '',
-        'key_aliases'       => []
+        'key_aliases'       => [],
+        'executed_actions'  => []
     ];
 
     public function __construct() {

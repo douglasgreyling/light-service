@@ -52,7 +52,8 @@ it('can convert itself to an array including its metadata', function() {
             'current_action'    => '',
             'current_organizer' => '',
             'key_aliases'       => [],
-            'rollback'          => false
+            'rollback'          => false,
+            'executed_actions'  => []
         ]
     ]);
 });

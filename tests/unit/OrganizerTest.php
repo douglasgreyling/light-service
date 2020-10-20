@@ -11,6 +11,14 @@ require_once 'tests/fixtures/organizers/AroundEachOrganizer.php';
 require_once 'tests/fixtures/organizers/AllHooksOrganizer.php';
 require_once 'tests/fixtures/organizers/KeyAliasesOrganizer.php';
 require_once 'tests/fixtures/organizers/RollbackOrganizer.php';
+require_once 'tests/fixtures/organizers/ReduceIfOrganizer.php';
+require_once 'tests/fixtures/organizers/ReduceUntilOrganizer.php';
+require_once 'tests/fixtures/organizers/ExecuteOrganizer.php';
+require_once 'tests/fixtures/organizers/AddToContextOrganizer.php';
+require_once 'tests/fixtures/organizers/RollbackOrchestratorLogicOrganizer.php';
+require_once 'tests/fixtures/organizers/FailingOrchestratorLogicOrganizer.php';
+require_once 'tests/fixtures/organizers/SkipRemainingOrchestratorLogicOrganizer.php';
+require_once 'tests/fixtures/organizers/IterateOrganizer.php';
 
 it('throws an error when the call function is not implemented', function() {
     NoCallFunctionOrganizer::call();
@@ -105,4 +113,64 @@ it('can rollback a set of actions', function() {
 
     expect($result->to_array())->toEqual(['number' => 0]);
     expect($result->message())->toEqual('I want to roll back!');
+});
+
+it('will reduce an action if the predicate returns true in the reduce if orchestrator logic function', function() {
+    $result = ReduceIfOrganizer::call(1);
+
+    expect($result->to_array())->toEqual(['number' => 4]);
+});
+
+it('will not reduce an action if the predicate returns false in the reduce if orchestrator logic function', function() {
+    $result = ReduceIfOrganizer::call(-3);
+
+    expect($result->to_array())->toEqual(['number' => -1]);
+});
+
+it('will reduce actions until the predicate returns true in the reduce until orchestrator logic function', function() {
+    $result = ReduceUntilOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 4]);
+});
+
+it('will reduce actions when the predicate returns false in the reduce until orchestrator logic function', function() {
+    $result = ReduceUntilOrganizer::call(5);
+
+    expect($result->to_array())->toEqual(['number' => 6]);
+});
+
+it('will execute a given callback action when the execute orchestrator logic function is used', function() {
+    $result = ExecuteOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 2]);
+});
+
+it('will add kvs to the context with the add to context orchestrator logic function', function() {
+    $result = AddToContextOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 1]);
+});
+
+it('will iterate over value for a given key and execute a set of actions with the iterate orchestrator logic function', function() {
+    $result = IterateOrganizer::call(['numbers' => [1, 2, 3], 'sum' => 0]);
+
+    expect($result->to_array())->toEqual(['numbers' => [1, 2, 3], 'sum' => 6]);
+});
+
+it('will rollback all the actions when orchestrator logic functions are used', function() {
+    $result = RollbackOrchestratorLogicOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => -1]);
+});
+
+it('will stop running all the actions when the context is marked as a failure and orchestrator logic functions are used', function() {
+    $result = FailingOrchestratorLogicOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 5]);
+});
+
+it('will skip all remaining actions when marked to skip all reamining actions and orchestrator logic functions are used', function() {
+    $result = SkipRemainingOrchestratorLogicOrganizer::call(0);
+
+    expect($result->to_array())->toEqual(['number' => 5]);
 });

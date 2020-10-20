@@ -6,16 +6,20 @@ require_once 'Context.php';
 require_once 'Orchestrator.php';
 
 require_once 'exceptions/NotImplementedException.php';
+require_once 'src/OrchestratorLogic.php';
 
 use Context;
 use Orchestrator;
+use OrchestratorLogic;
 
 use NotImplementedException;
 
 trait Organizer {
+    use OrchestratorLogic;
+
     public $context;
 
-    public function __construct($context) {
+    public function __construct($context = []) {
         $this->context = new Context($context);
         $this->context->set_current_organizer(self::class);
     }
@@ -29,12 +33,9 @@ trait Organizer {
     }
 
     public function reduce(...$actions) {
-        $action_orchestrator = new Orchestrator(
-            $actions,
-            $this
-        );
+        $action_orchestrator = new Orchestrator($this);
 
-        $this->context = $action_orchestrator->run();
+        $this->context = $action_orchestrator->run($actions);
 
         return $this->context;
     }

@@ -1,74 +1,78 @@
 <?php
 
-it('can run through a list of actions belonging to an organizer', function() {
-    $action_orchestrator = new Orchestrator(
-        new SuccessfulOrganizer(['number' => 1])
-    );
+use PHPUnit\Framework\TestCase;
 
-    $result = $action_orchestrator->run([
-        AddsOneAction::class,
-        AddsOneAction::class,
-        AddsOneAction::class
-    ]);
+final class OrchestratorTest extends TestCase {
+    public function test_it_can_run_through_a_list_of_actions_belonging_to_an_organizer() {
+        $action_orchestrator = new Orchestrator(
+            new SuccessfulOrganizer(['number' => 1])
+        );
 
-    expect($result->to_array())->toEqual(['number' => 4]);
-});
+        $result = $action_orchestrator->run([
+            AddsOneAction::class,
+            AddsOneAction::class,
+            AddsOneAction::class
+        ]);
 
-it('can skip running the remaining actions when the context has been marked as a failure', function() {
-    $action_orchestrator = new Orchestrator(
-        new FailingOrganizer(['number' => 1])
-    );
+        $this->assertEquals(['number' => 4], $result->to_array());
+    }
 
-    $result = $action_orchestrator->run([
-        AddsOneAction::class,
-        FailingAction::class,
-        AddsOneAction::class
-    ]);
+    public function test_it_can_skip_running_the_remaining_actions_when_the_context_has_been_marked_as_a_failure() {
+        $action_orchestrator = new Orchestrator(
+            new FailingOrganizer(['number' => 1])
+        );
 
-    expect($result->to_array())->toEqual(['number' => 2]);
-});
+        $result = $action_orchestrator->run([
+            AddsOneAction::class,
+            FailingAction::class,
+            AddsOneAction::class
+        ]);
 
-it('can skip remaining actions when marked to skip remaining actions', function() {
-    $action_orchestrator = new Orchestrator(
-        new SkipRemainingOrganizer(['number' => 1])
-    );
+        $this->assertEquals(['number' => 2], $result->to_array());
+    }
 
-    $result = $action_orchestrator->run([
-        AddsOneAction::class,
-        SkipRemainingAction::class,
-        AddsOneAction::class
-    ]);
+    public function test_it_can_skip_remaining_actions_when_marked_to_skip_remaining_actions() {
+        $action_orchestrator = new Orchestrator(
+            new SkipRemainingOrganizer(['number' => 1])
+        );
 
-    expect($result->to_array())->toEqual(['number' => 2]);
-});
+        $result = $action_orchestrator->run([
+            AddsOneAction::class,
+            SkipRemainingAction::class,
+            AddsOneAction::class
+        ]);
 
-it('can rollback the remaining actions when marked to rollback previously run actions', function() {
-    $action_orchestrator = new Orchestrator(
-        new RollbackOrganizer(['number' => 1])
-    );
+        $this->assertEquals(['number' => 2], $result->to_array());
+    }
 
-    $result = $action_orchestrator->run([
-        AddsOneAction::class,
-        AddsOneAction::class,
-        AddsOneAction::class,
-        AddsOneAction::class,
-        RollbackAction::class,
-        AddsOneAction::class,
-    ]);
+    public function test_it_can_rollback_the_remaining_actions_when_marked_to_rollback_previously_run_actions() {
+        $action_orchestrator = new Orchestrator(
+            new RollbackOrganizer(['number' => 1])
+        );
 
-    expect($result->to_array())->toEqual(['number' => 0]);
-});
+        $result = $action_orchestrator->run([
+            AddsOneAction::class,
+            AddsOneAction::class,
+            AddsOneAction::class,
+            AddsOneAction::class,
+            RollbackAction::class,
+            AddsOneAction::class,
+        ]);
 
-it('can switch key aliases for a context when an action uses keys marked as key aliases', function() {
-    $action_orchestrator = new Orchestrator(
-        new KeyAliasesOrganizer(['number' => 1])
-    );
+        $this->assertEquals(['number' => 0], $result->to_array());
+    }
 
-    $result = $action_orchestrator->run([
-        AddsOneAction::class,
-        KeyAliasesAction::class,
-        AddsOneAction::class
-    ]);
+    public function test_it_can_switch_key_aliases_for_a_context_when_an_action_uses_keys_marked_as_key_aliases() {
+        $action_orchestrator = new Orchestrator(
+            new KeyAliasesOrganizer(['number' => 1])
+        );
 
-    expect($result->to_array())->toEqual(['number' => 4]);
-});
+        $result = $action_orchestrator->run([
+            AddsOneAction::class,
+            KeyAliasesAction::class,
+            AddsOneAction::class
+        ]);
+
+        $this->assertEquals(['number' => 4], $result->to_array());
+    }
+}

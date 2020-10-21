@@ -1,218 +1,221 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'src/Context.php';
 require_once 'src/exceptions/NextActionException.php';
 require_once 'src/exceptions/KeyAliasException.php';
 
-it('is instantiated with an empty context when given no state', function() {
-    $context = new Context();
+final class ContextTest extends TestCase {
+    public function test_it_is_instantiated_with_an_empty_context_when_given_no_state() {
+        $context = new Context();
 
-    expect($context->to_array())->toBeEmpty();
-});
-
-it('is instantiated with a context based on its given state', function() {
-    $state   = ['a' => 1, 'b' => 2];
-    $context = new Context($state);
-
-    expect($context->to_array())->toEqual(['a' => 1, 'b' => 2]);
-});
-
-it('is instantiated with a context failure flag of false', function() {
-    $context = new Context();
-
-    expect($context->failure())->toBeFalse();
-});
-
-it('is instantiated with a context failure flag of true', function() {
-    $context = new Context();
-
-    expect($context->success())->toBeTrue();
-});
-
-it('can convert itself to an array', function() {
-    $state   = ['a' => 1, 'b' => 2];
-    $context = new Context($state);
-
-    expect($context->to_array())->toEqual(['a' => 1, 'b' => 2]);
-});
-
-it('can convert itself to an array including its metadata', function() {
-    $state   = ['a' => 1, 'b' => 2];
-    $context = new Context($state);
-
-    expect($context->to_array(true))->toEqual([
-        'a'         => 1,
-        'b'         => 2,
-        '_metadata' => [
-            'failure'           => false,
-            'success'           => true,
-            'message'           => '',
-            'error_code'        => '',
-            'skip_remaining'    => false,
-            'current_action'    => '',
-            'current_organizer' => '',
-            'key_aliases'       => [],
-            'rollback'          => false,
-            'executed_actions'  => []
-        ]
-    ]);
-});
-
-it('fetches values from the context like an object', function() {
-    $context = new Context(['a' => 1]);
-
-    expect($context->a)->toEqual(1);
-});
-
-it('can set values like properties of an object', function() {
-    $context = new Context();
-
-    $context->a[] = 1;
-    $context->b = 0;
-    $context->b += 1;
-    $context->c = 'foo';
-    $context->c .= 'bar';
-
-    expect($context->a)->toEqual([1]);
-    expect($context->b)->toEqual(1);
-    expect($context->c)->toEqual('foobar');
-});
-
-it('returns a value of null when the property being fetched does not exist in the context', function() {
-    $context = new Context(['a' => 1]);
-
-    expect($context->b)->toBeNull();
-});
-
-it('can merge a set of key/value pairs into the context using the merge function', function() {
-    $context = new Context(['a' => 1]);
-
-    $context->merge(['b' => 2, 'c' => 3]);
-
-    expect($context->to_array())->toEqual(['a' => 1, 'b' => 2, 'c' => 3]);
-});
-
-it('can merge a set of key/value pairs into the context using the array merge function', function() {
-    $context = new Context(['a' => 1]);
-
-    $context->array_merge(['b' => 2, 'c' => 3]);
-
-    expect($context->to_array())->toEqual(['a' => 1, 'b' => 2, 'c' => 3]);
-});
-
-it('can retrieve the keys inside the context with the keys function', function () {
-    $state   = ['a' => 1, 'b' => 2];
-    $context = new Context($state);
-
-    expect($context->keys())->toEqual(['a', 'b']);
-});
-
-it('can retrieve the values inside the context with the values function', function() {
-    $state   = ['a' => 1, 'b' => 2];
-    $context = new Context($state);
-
-    expect($context->values())->toEqual([1, 2]);
-});
-
-it('can retrieve multiple key/value pairs using the fetch function', function() {
-    $state   = ['a' => 1, 'b' => 2, 'c' => 3];
-    $context = new Context($state);
-
-    expect($context->fetch(['a', 'c']))->toEqual(['a' => 1, 'c' => 3]);
-});
-
-it('marks the failure flag as true and the success flag as false when the context is explicitly failed', function() {
-    $state   = ['a' => 1, 'b' => 2, 'c' => 3];
-    $context = new Context($state);
-
-    $context->fail();
-
-    expect($context->failure())->toBeTrue();
-});
-
-it('can add an additional failure message when the context is explicitly failed', function() {
-    $state   = ['a' => 1, 'b' => 2, 'c' => 3];
-    $context = new Context($state);
-
-    $context->fail('foo');
-
-    expect($context->message())->toEqual('foo');
-});
-
-it('can mark the failure flag as true and throw a NextActionException when the fail_and_return function is called', function() {
-    $context = new Context();
-    $correct_exception_thrown = false;
-
-    try {
-        $context->fail_and_return('foo');
-    } catch (NextActionException $e) {
-        $correct_exception_thrown = true;
+        $this->assertEmpty($context->to_array());
     }
 
-    expect($correct_exception_thrown)->toBeTrue();
-    expect($context->failure())->toBeTrue();
-});
+    public function test_it_is_instantiated_with_a_context_based_on_its_given_state() {
+        $state   = ['a' => 1, 'b' => 2];
+        $context = new Context($state);
 
-it('can mark the skip_remaining flag when the skip_remaining function is called', function() {
-    $context = new Context();
-
-    $context->skip_remaining();
-
-    expect($context->must_skip_all_remaining_actions())->toBeTrue();
-});
-
-it('can set and get the current action', function() {
-    $context = new Context();
-
-    $context->set_current_action('SomeAction');
-
-    expect($context->current_action())->toEqual('SomeAction');
-});
-
-it('can set and get the current organizer', function() {
-    $context = new Context();
-
-    $context->set_current_organizer('SomeOrganizer');
-
-    expect($context->current_organizer())->toEqual('SomeOrganizer');
-});
-
-it('use a set of key aliases to change the context', function() {
-    $context = new Context(['a' => 'value']);
-    $context->use_aliases(['a' => 'an_alias_for_a']);
-
-    expect($context->an_alias_for_a)->toEqual('value');
-    expect($context->to_array())->toEqual([
-        'an_alias_for_a' => 'value'
-    ]);
-});
-
-it('throws an exception when it attempts to use and set a key alias which already exists inside the context', function() {
-    $context = new Context(['a' => 'value', 'an_alias_for_a' => 'some other value']);
-    $context->use_aliases(['a' => 'an_alias_for_a']);
-})->throws(KeyAliasException::class);
-
-it('can fail a context with an error code', function() {
-    $context = new Context();
-
-    $context->fail('Something went wrong', 4001);
-
-    expect($context->message())->toEqual('Something went wrong');
-    expect($context->error_code())->toEqual(4001);
-});
-
-it('can fail a context and skip to the next action with an error code', function() {
-    $context = new Context();
-    $correct_exception_thrown = false;
-
-    try {
-        $context->fail_and_return('Something went wrong', 4001);
-    } catch (NextActionException $e) {
-        $correct_exception_thrown = true;
+        $this->assertEquals(['a' => 1, 'b' => 2], $context->to_array());
     }
 
-    expect($correct_exception_thrown)->toBeTrue();
-    expect($context->failure())->toBeTrue();
-    expect($context->message())->toEqual('Something went wrong');
-    expect($context->error_code())->toEqual(4001);
-});
+    public function test_it_is_instantiated_with_a_context_failure_flag_of_false() {
+        $context = new Context();
+
+        $this->assertFalse($context->failure());
+    }
+
+    public function test_it_is_instantiated_with_a_context_success_flag_of_true() {
+        $context = new Context();
+
+        $this->assertTrue($context->success());
+    }
+
+    public function test_it_can_convert_itself_to_an_array() {
+        $state   = ['a' => 1, 'b' => 2];
+        $context = new Context($state);
+
+        $this->assertEquals(['a' => 1, 'b' => 2], $context->to_array());
+    }
+
+    public function test_can_convert_itself_to_an_array_including_its_metadata() {
+        $state   = ['a' => 1, 'b' => 2];
+        $context = new Context($state);
+
+        $this->assertEquals(
+            [
+                'a'         => 1,
+                'b'         => 2,
+                '_metadata' => [
+                    'failure'           => false,
+                    'success'           => true,
+                    'message'           => '',
+                    'error_code'        => '',
+                    'skip_remaining'    => false,
+                    'current_action'    => '',
+                    'current_organizer' => '',
+                    'key_aliases'       => [],
+                    'rollback'          => false,
+                    'executed_actions'  => []
+                ]
+            ],
+            $context->to_array(true));
+    }
+
+    public function test_it_fetches_values_from_the_context_like_an_object() {
+        $context = new Context(['a' => 1]);
+
+        $this->assertEquals(1, $context->a);
+    }
+
+    public function test_it_can_set_values_like_properties_of_an_object() {
+        $context = new Context();
+
+        $context->a[] = 1;
+        $context->b = 0;
+        $context->b += 1;
+        $context->c = 'foo';
+        $context->c .= 'bar';
+
+        $this->assertEquals(
+            [
+                'a' => [1],
+                'b' => 1,
+                'c' => 'foobar'
+            ],
+            $context->to_array()
+        );
+    }
+
+    public function test_it_returns_a_value_of_null_when_the_property_being_fetched_does_not_exist_in_the_context() {
+        $context = new Context(['a' => 1]);
+
+        $this->assertNull($context->b);
+    }
+
+    public function test_it_can_merge_a_set_of_key_value_pairs_into_the_context_using_the_merge_function() {
+        $context = new Context(['a' => 1]);
+
+        $context->merge(['b' => 2, 'c' => 3]);
+
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->to_array());
+    }
+
+    public function test_it_can_retrieve_keys_inside_the_context_with_the_keys_function() {
+        $state   = ['a' => 1, 'b' => 2];
+        $context = new Context($state);
+
+        $this->assertEquals(['a', 'b'], $context->keys());
+    }
+
+    public function test_it_can_retrieve_the_values_inside_the_context_with_the_values_function() {
+        $state   = ['a' => 1, 'b' => 2];
+        $context = new Context($state);
+
+        $this->assertEquals([1, 2], $context->values());
+    }
+
+    public function test_it_can_retrieve_multiple_key_value_pairs_using_the_fetch_function() {
+        $state   = ['a' => 1, 'b' => 2, 'c' => 3];
+        $context = new Context($state);
+
+        $this->assertEquals(['a' => 1, 'c' => 3], $context->fetch(['a', 'c']));
+    }
+
+    public function test_it_marks_the_failure_flag_as_true_and_the_success_flag_as_false_when_the_context_is_explicitly_failed() {
+        $state   = ['a' => 1, 'b' => 2, 'c' => 3];
+        $context = new Context($state);
+
+        $context->fail();
+
+        $this->assertTrue($context->failure());
+    }
+
+    public function test_it_can_add_an_additional_failure_message_when_the_context_is_explicitly_failed() {
+        $state   = ['a' => 1, 'b' => 2, 'c' => 3];
+        $context = new Context($state);
+
+        $context->fail('foo');
+
+        $this->assertEquals('foo', $context->message());
+    }
+
+    public function test_it_can_mark_the_failure_flag_as_true_and_throw_a_NextActionException_when_the_fail_and_return_function_is_called() {
+        $context                  = new Context();
+        $correct_exception_thrown = false;
+
+        try {
+            $context->fail_and_return('foo');
+        } catch (NextActionException $e) {
+            $correct_exception_thrown = true;
+        }
+
+        $this->assertTrue($correct_exception_thrown);
+        $this->assertTrue($context->failure());
+    }
+
+    public function test_it_can_mark_the_skip_remaining_flag_when_the_skip_remaining_function_is_called() {
+        $context = new Context();
+
+        $context->skip_remaining();
+
+        $this->assertTrue($context->must_skip_all_remaining_actions());
+    }
+
+    public function test_it_can_set_and_get_the_current_action() {
+        $context = new Context();
+
+        $context->set_current_action('SomeAction');
+
+        $this->assertEquals('SomeAction', $context->current_action());
+    }
+
+    public function test_it_can_set_and_get_the_current_organizer() {
+        $context = new Context();
+
+        $context->set_current_organizer('SomeOrganizer');
+
+        $this->assertEquals('SomeOrganizer', $context->current_organizer());
+    }
+
+    public function test_it_can_use_a_set_of_key_aliases_to_change_the_context() {
+        $context = new Context(['a' => 'value']);
+        $context->use_aliases(['a' => 'an_alias_for_a']);
+
+        $this->assertEquals('value', $context->an_alias_for_a);
+        $this->assertEquals(['an_alias_for_a' => 'value'], $context->to_array());
+    }
+
+    public function test_it_throws_an_exception_when_it_attempts_to_use_and_set_a_key_alias_which_already_exists_inside_the_context() {
+        $this->expectException(KeyAliasException::class);
+
+        $context = new Context(['a' => 'value', 'an_alias_for_a' => 'some other value']);
+        $context->use_aliases(['a' => 'an_alias_for_a']);
+    }
+
+    public function test_it_can_fail_a_context_with_an_error_code() {
+        $context = new Context();
+
+        $context->fail('Something went wrong', 4001);
+
+        $this->assertEquals('Something went wrong', $context->message());
+        $this->assertEquals($context->error_code(), 4001);
+    }
+
+    public function test_it_can_fail_a_context_and_skip_to_the_next_action_with_an_error_code() {
+        $context                  = new Context();
+        $correct_exception_thrown = false;
+
+        try {
+            $context->fail_and_return('Something went wrong', 4001);
+        } catch (NextActionException $e) {
+            $correct_exception_thrown = true;
+        }
+
+        $this->assertTrue($correct_exception_thrown);
+        $this->assertTrue($context->failure());
+        $this->assertEquals('Something went wrong', $context->message());
+        $this->assertEquals(4001, $context->error_code());
+    }
+}

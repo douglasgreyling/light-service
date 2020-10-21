@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'tests/fixtures/organizers/NoCallFunctionOrganizer.php';
 require_once 'tests/fixtures/organizers/DoesNothingOrganizer.php';
 require_once 'tests/fixtures/organizers/SuccessfulOrganizer.php';
@@ -20,157 +22,174 @@ require_once 'tests/fixtures/organizers/FailingOrchestratorLogicOrganizer.php';
 require_once 'tests/fixtures/organizers/SkipRemainingOrchestratorLogicOrganizer.php';
 require_once 'tests/fixtures/organizers/IterateOrganizer.php';
 
-it('throws an error when the call function is not implemented', function() {
-    NoCallFunctionOrganizer::call();
-})->throws(NotImplementedException::class);
+final class OrganizerTest extends TestCase {
+    public function test_it_throws_an_error_when_the_call_function_is_not_implemented() {
+        $this->expectException(NotImplementedException::class);
 
-it('instantiates an organizer with the given context when using the with function', function() {
-    $result = DoesNothingOrganizer::call(['a' => 1]);
+        NoCallFunctionOrganizer::call();
+    }
 
-    expect($result->to_array())->toEqual(['a' => 1]);
-});
+    public function test_it_instantiates_an_organizer_with_the_given_context_when_using_the_with_function() {
+        $result = DoesNothingOrganizer::call(['a' => 1]);
 
-it('instantiates the organizer context with the class of the organizer', function() {
-    $result = DoesNothingOrganizer::call(['a' => 1]);
+        $this->assertEquals(['a' => 1], $result->to_array());
+    }
 
-    expect($result->current_organizer())->toEqual(DoesNothingOrganizer::class);
-});
+    public function test_it_instantiates_the_organizer_context_with_the_class_of_the_organizer() {
+        $result = DoesNothingOrganizer::call(['a' => 1]);
 
-it('executes all of the actions provided to it where they are applicable', function() {
-    $result = SuccessfulOrganizer::call(0);
+        $this->assertEquals(DoesNothingOrganizer::class, $result->current_organizer());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 3]);
-});
+    public function test_it_executes_all_of_the_actions_provided_to_it_where_they_are_applicable() {
+        $result = SuccessfulOrganizer::call(0);
 
-it('will skip actions which call the next_context function', function() {
-    $result = OneSkipOrganizer::call(0);
+        $this->assertEquals(['number' => 3], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 2]);
-});
+    public function test_it_will_skip_actions_which_call_the_next_context_function() {
+        $result = OneSkipOrganizer::call(0);
 
-it('marks the context as a success when nothing goes wrong', function() {
-    $result = SuccessfulOrganizer::call(0);
+        $this->assertEquals(['number' => 2], $result->to_array());
+    }
 
-    expect($result->success())->toBeTrue();
-    expect($result->failure())->toBeFalse();
-});
+    public function test_it_marks_the_context_as_a_success_when_nothing_goes_wrong() {
+        $result = SuccessfulOrganizer::call(0);
 
-it('marks the context as a failure when an action fails the context', function() {
-    $result = FailingOrganizer::call(0);
+        $this->assertTrue($result->success());
+        $this->assertFalse($result->failure());
+    }
 
-    expect($result->success())->toBeFalse();
-    expect($result->failure())->toBeTrue();
-    expect($result->message())->toEqual('foo');
-});
+    public function test_it_marks_the_context_as_a_failure_when_an_action_fails_the_context() {
+        $result = FailingOrganizer::call(0);
 
-it('stops executing remaining actions when an actions fails the context', function() {
-    $result = FailingOrganizer::call(0);
+        $this->assertFalse($result->success());
+        $this->assertTrue($result->failure());
+        $this->assertEquals('foo', $result->message());
+    }
 
-    expect($result->success())->toBeFalse();
-    expect($result->failure())->toBeTrue();
-    expect($result->to_array())->toEqual(['number' => 1]);
-});
+    public function test_it_stops_executing_remaining_actions_when_an_actions_fails_the_context() {
+        $result = FailingOrganizer::call(0);
 
-it('shows the failure message when an action fails the context', function() {
-    $result = FailingOrganizer::call(0);
+        $this->assertFalse($result->success());
+        $this->assertTrue($result->failure());
+        $this->assertEquals(['number' => 1], $result->to_array());
+    }
 
-    expect($result->message())->toEqual('foo');
-});
+    public function test_it_shows_the_failure_message_when_an_action_fails_the_context() {
+        $result = FailingOrganizer::call(0);
 
-it('can skip remaining action by using the skip_remaining on the context', function() {
-    $result = SkipRemainingOrganizer::call(0);
+        $this->assertEquals('foo', $result->message());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 1]);
-    expect($result->message())->toEqual('Skipped remaining actions');
-});
+    public function test_it_can_skip_remaining_action_by_using_the_skip_remaining_on_the_context() {
+        $result = SkipRemainingOrganizer::call(0);
 
-it('can execute before and after actions', function() {
-    $result = BeforeAfterEachOrganizer::call();
+        $this->assertEquals(['number' => 1], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['hooks_called' => ['before', 'after', 'before', 'after']]);
-});
+    public function test_it_can_execute_before_and_after_actions() {
+        $result = BeforeAfterEachOrganizer::call();
 
-it('can execute around each actions', function() {
-    $result = AroundEachOrganizer::call();
+        $this->assertEquals(['hooks_called' => ['before', 'after', 'before', 'after']], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['hook_count' => 4]);
-});
+    public function test_it_can_execute_around_each_actions() {
+        $result = AroundEachOrganizer::call();
 
-it('can execute around, before and each actions in the correct order', function() {
-    $result = AllHooksOrganizer::call();
+        $this->assertEquals(['hook_count' => 4], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['hooks_called' => ['around', 'before', 'after', 'around', 'around', 'before', 'after', 'around']]);
-});
+    public function test_it_can_execute_around_before_and_each_actions_in_the_correct_order() {
+        $result = AllHooksOrganizer::call();
 
-it('can use set key aliases for keys in the context', function() {
-    $result = KeyAliasesOrganizer::call(1);
+        $this->assertEquals(
+            [
+                'hooks_called' => [
+                    'around',
+                    'before',
+                    'after',
+                    'around',
+                    'around',
+                    'before',
+                    'after',
+                    'around'
+                ]
+            ],
+            $result->to_array()
+        );
+    }
 
-    expect($result->to_array())->toEqual(['number' => 4]);
-});
+    public function test_it_can_use_set_key_aliases_for_keys_in_the_context() {
+        $result = KeyAliasesOrganizer::call(1);
 
-it('can rollback a set of actions', function() {
-    $result = RollbackOrganizer::call(1);
+        $this->assertEquals(['number' => 4], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 0]);
-    expect($result->message())->toEqual('I want to roll back!');
-});
+    public function test_it_can_rollback_a_set_of_actions() {
+        $result = RollbackOrganizer::call(1);
 
-it('will reduce an action if the predicate returns true in the reduce if orchestrator logic function', function() {
-    $result = ReduceIfOrganizer::call(1);
+        $this->assertEquals(['number' => 0], $result->to_array());
+        $this->assertEquals('I want to roll back!', $result->message());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 4]);
-});
+    public function test_it_will_reduce_an_action_if_the_predicate_returns_true_in_the_reduce_if_orchestrator_logic_function() {
+        $result = ReduceIfOrganizer::call(1);
 
-it('will not reduce an action if the predicate returns false in the reduce if orchestrator logic function', function() {
-    $result = ReduceIfOrganizer::call(-3);
+        $this->assertEquals(['number' => 4], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => -1]);
-});
+    public function test_it_will_not_reduce_an_action_if_the_predicate_returns_false_in_the_reduce_if_orchestrator_logic_function() {
+        $result = ReduceIfOrganizer::call(-3);
 
-it('will reduce actions until the predicate returns true in the reduce until orchestrator logic function', function() {
-    $result = ReduceUntilOrganizer::call(0);
+        $this->assertEquals(['number' => -1], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 4]);
-});
+    public function test_it_will_reduce_actions_until_the_predicate_returns_true_in_the_reduce_until_orchestrator_logic_function() {
+        $result = ReduceUntilOrganizer::call(0);
 
-it('will reduce actions when the predicate returns false in the reduce until orchestrator logic function', function() {
-    $result = ReduceUntilOrganizer::call(5);
+        $this->assertEquals(['number' => 4], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 6]);
-});
+    public function test_it_will_reduce_actions_when_the_predicate_returns_false_in_the_reduce_until_orchestrator_logic_function() {
+        $result = ReduceUntilOrganizer::call(5);
 
-it('will execute a given callback action when the execute orchestrator logic function is used', function() {
-    $result = ExecuteOrganizer::call(0);
+        $this->assertEquals(['number' => 6], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 2]);
-});
+    public function test_it_will_execute_a_given_callback_action_when_the_execute_orchestrator_logic_function_is_used() {
+        $result = ExecuteOrganizer::call(0);
 
-it('will add kvs to the context with the add to context orchestrator logic function', function() {
-    $result = AddToContextOrganizer::call(0);
+        $this->assertEquals(['number' => 2], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 1]);
-});
+    public function test_it_will_add_kvs_to_the_context_with_the_add_to_context_orchestrator_logic_function() {
+        $result = AddToContextOrganizer::call(0);
 
-it('will iterate over value for a given key and execute a set of actions with the iterate orchestrator logic function', function() {
-    $result = IterateOrganizer::call(['numbers' => [1, 2, 3], 'sum' => 0]);
+        $this->assertEquals(['number' => 1], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['numbers' => [1, 2, 3], 'sum' => 6]);
-});
+    public function test_it_will_iterate_over_value_for_a_given_key_and_execute_a_set_of_actions_with_the_iterate_orchestrator_logic_function() {
+        $result = IterateOrganizer::call(['numbers' => [1, 2, 3], 'sum' => 0]);
 
-it('will rollback all the actions when orchestrator logic functions are used', function() {
-    $result = RollbackOrchestratorLogicOrganizer::call(0);
+        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 6], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => -1]);
-});
+    public function test_it_will_rollback_all_the_actions_when_orchestrator_logic_functions_are_used() {
+        $result = RollbackOrchestratorLogicOrganizer::call(0);
 
-it('will stop running all the actions when the context is marked as a failure and orchestrator logic functions are used', function() {
-    $result = FailingOrchestratorLogicOrganizer::call(0);
+        $this->assertEquals(['number' => -1], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 5]);
-});
+    public function test_it_will_stop_running_all_the_actions_when_the_context_is_marked_as_a_failure_and_orchestrator_logic_functions_are_used() {
+        $result = FailingOrchestratorLogicOrganizer::call(0);
 
-it('will skip all remaining actions when marked to skip all reamining actions and orchestrator logic functions are used', function() {
-    $result = SkipRemainingOrchestratorLogicOrganizer::call(0);
+        $this->assertEquals(['number' => 5], $result->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 5]);
-});
+    public function test_it_will_skip_all_remaining_actions_when_marked_to_skip_all_reamining_actions_and_orchestrator_logic_functions_are_used() {
+        $result = SkipRemainingOrchestratorLogicOrganizer::call(0);
+
+        $this->assertEquals(['number' => 5], $result->to_array());
+    }
+}

@@ -1,24 +1,42 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'src/ActionHookWrapper.php';
 
 require_once 'tests/fixtures/organizers/BeforeAfterHooksOrganizer.php';
 require_once 'tests/fixtures/organizers/AroundHooksOrganizer.php';
 
-it('wraps an organizers before and after hooks around an action', function() {
-    $context = BeforeAfterHooksOrganizer::call()->to_array();
+final class ActionHookWrapperTest extends TestCase {
+    public function test_it_wraps_an_organizers_before_and_after_hooks_around_an_action() {
+        $context = BeforeAfterHooksOrganizer::call()->to_array();
 
-    expect($context)->toEqual(['a' => ['before', 'action', 'after']]);
-});
+        $this->assertEquals(['a' => ['before', 'action', 'after']], $context);
+    }
 
-it('wraps an organizers around hooks around an action', function() {
-    $context = AroundHooksOrganizer::call()->to_array();
+    public function test_it_wraps_an_organizers_around_hooks_around_an_action() {
+        $context = AroundHooksOrganizer::call()->to_array();
 
-    expect($context)->toEqual(['a' => ['around', 'action', 'around']]);
-});
+        $this->assertEquals(['a' => ['around', 'action', 'around']], $context);
+    }
 
-it('wraps all of an organizers hooks around an action', function() {
-    $context = AllHooksOrganizer::call()->to_array();
+    public function test_it_wraps_all_of_an_organizers_hooks_around_an_action() {
+        $context = AllHooksOrganizer::call()->to_array();
 
-    expect($context)->toEqual(['hooks_called' => ['around', 'before', 'after', 'around', 'around', 'before', 'after', 'around']]);
-});
+        $this->assertEquals(
+            [
+                'hooks_called' => [
+                    'around',
+                    'before',
+                    'after',
+                    'around',
+                    'around',
+                    'before',
+                    'after',
+                    'around'
+                ]
+            ],
+            $context
+        );
+    }
+}

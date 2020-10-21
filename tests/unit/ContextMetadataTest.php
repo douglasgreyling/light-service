@@ -1,62 +1,67 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'src/ContextMetadata.php';
 
-it('is instantiated with the default metadata values', function() {
-  $context_metadata = new ContextMetadata();
+final class ContextMetadataTest extends TestCase {
+    public function test_it_is_instantiated_with_the_default_metadata_values() {
+        $context_metadata = new ContextMetadata();
 
-  foreach(ContextMetadata::DEFAULT_METADATA as $metadata => $default)
-    expect($context_metadata->$metadata)->toEqual($default);
-});
+        foreach(ContextMetadata::DEFAULT_METADATA as $metadata => $default)
+            $this->assertEquals($default, $context_metadata->$metadata);
+    }
 
-it('can be converted to an array', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_can_be_convert_to_an_array() {
+        $context_metadata = new ContextMetadata();
 
-    expect($context_metadata->to_array())->toEqual(ContextMetadata::DEFAULT_METADATA);
-});
+        $this->assertEquals(ContextMetadata::DEFAULT_METADATA, $context_metadata->to_array());
+    }
 
-it('can mark the failure flag as true', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_can_mark_the_failure_flag_as_true() {
+        $context_metadata = new ContextMetadata();
 
-    $context_metadata->fail();
+        $context_metadata->fail();
 
-    expect($context_metadata->failure)->toBeTrue();
-});
+        $this->assertTrue($context_metadata->failure);
+    }
 
-it('can mark the failure flag as true with a message', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_can_mark_the_failure_flag_as_true_with_a_message() {
+        $context_metadata = new ContextMetadata();
 
-    $context_metadata->fail('Foo');
+        $context_metadata->fail('Foo');
 
-    expect($context_metadata->message)->toEqual('Foo');
-});
+        $this->assertEquals('Foo', $context_metadata->message);
+    }
 
-it('can mark the failure flag as true with a message and an error code', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_can_mark_the_failure_flag_as_true_with_a_message_and_an_error_code() {
+        $context_metadata = new ContextMetadata();
 
-    $context_metadata->fail('Foo', 100);
+        $context_metadata->fail('Foo', 100);
 
-    expect($context_metadata->error_code)->toEqual(100);
-});
+        $this->assertEquals('Foo', $context_metadata->message);
+        $this->assertEquals(100, $context_metadata->error_code);
+    }
 
-it('returns the inverse key for a given alias key when it exists', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_returns_the_inverse_key_for_a_given_alias_key_when_it_exists() {
+        $context_metadata = new ContextMetadata();
 
-    $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
+        $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
 
-    expect($context_metadata->invert_alias('an_alias_for_a'))->toEqual('a');
-});
+        $this->assertEquals('a', $context_metadata->invert_alias('an_alias_for_a'));
+    }
 
-it('returns null for a given alias key when it does not exist', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_returns_null_for_a_given_alias_key_when_it_does_not_exist() {
+        $context_metadata = new ContextMetadata();
 
-    expect($context_metadata->invert_alias('an_alias_for_a'))->toBeNull();
-});
+        $this->assertNull($context_metadata->invert_alias('an_alias_for_a'));
+    }
 
-it('can determine if a given key alias exists', function() {
-    $context_metadata = new ContextMetadata();
+    public function test_it_can_determine_if_a_given_key_alias_exists() {
+        $context_metadata = new ContextMetadata();
 
-    $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
+        $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
 
-    expect($context_metadata->alias_exists('an_alias_for_a'))->toBeTrue();
-});
+        $this->assertTrue($context_metadata->alias_exists('an_alias_for_a'));
+    }
+}

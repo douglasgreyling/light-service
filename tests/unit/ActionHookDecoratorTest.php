@@ -1,27 +1,31 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'src/ActionHookDecorator.php';
 
-it('wraps before and after callbacks around a function', function() {
-  $a = [];
+final class ActionHookDecoratorTest extends TestCase {
+    public function test_it_wraps_before_and_after_callbacks_around_a_function() {
+        $a = [];
 
-  ActionHookDecorator::decorate(
-    function() use(&$a) { $a[] = 'before'; },
-    function() use(&$a) { return $a[] = 'actual'; },
-    function() use(&$a) { $a[] = 'after'; }
-  )();
+        ActionHookDecorator::decorate(
+            function() use(&$a) { $a[] = 'before'; },
+            function() use(&$a) { return $a[] = 'actual'; },
+            function() use(&$a) { $a[] = 'after'; }
+        )();
 
-  expect($a)->toEqual(['before', 'actual', 'after']);
-});
+        $this->assertEquals(['before', 'actual', 'after'], $a);
+    }
 
-it('returns the return value of the actual callback function', function() {
-  $a = [];
+    public function test_it_returns_the_return_value_of_the_actual_callback_function() {
+        $a = [];
 
-  $result = ActionHookDecorator::decorate(
-    function() use(&$a) { $a[] = 'before'; },
-    function() use(&$a) { return $a[] = 'actual'; },
-    function() use(&$a) { $a[] = 'after'; }
-  )();
+        $result = ActionHookDecorator::decorate(
+            function() use(&$a) { $a[] = 'before'; },
+            function() use(&$a) { return $a[] = 'actual'; },
+            function() use(&$a) { $a[] = 'after'; }
+        )();
 
-  expect($result)->toEqual('actual');
-});
+        $this->assertEquals('actual', $result);
+    }
+}

@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once 'tests/fixtures/actions/MissingAllPromisesAction.php';
 require_once 'tests/fixtures/actions/MissingSomePromisesAction.php';
 require_once 'tests/fixtures/actions/NextActionAction.php';
@@ -12,107 +14,119 @@ require_once 'tests/fixtures/actions/FailAndReturnAction.php';
 require_once 'tests/fixtures/actions/SingleExpectsAndPromisesAction.php';
 require_once 'tests/fixtures/actions/KeyAliasesAction.php';
 
-it('can be instantiated with an associated array as context', function() {
-    $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
+final class ActionTest extends TestCase {
+    public function test_it_can_be_instantiated_with_an_associated_array_as_context() {
+        $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
 
-    expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
-});
+        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->to_array());
+    }
 
-it('can be instantiated with an Context as context', function() {
-    $action_context = new Context(['a' => 1, 'b' => 2]);
-    $action         = new SuccessfulAction($action_context);
+    public function test_it_can_be_instantiated_with_a_given_context_as_action_context() {
+        $action_context = new Context(['a' => 1, 'b' => 2]);
+        $action         = new SuccessfulAction($action_context);
 
-    expect($action->context()->to_array())->toEqual(['a' => 1, 'b' => 2]);
-});
+        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->to_array());
+    }
 
-it('instantiates the action context with the class of the action', function() {
-    $action_context = new Context();
-    $action         = new SuccessfulAction($action_context);
+    public function test_it_instantiates_the_action_context_with_the_class_of_the_action() {
+        $action_context = new Context();
+        $action         = new SuccessfulAction($action_context);
 
-    expect($action->context()->current_action())->toEqual(SuccessfulAction::class);
-});
+        $this->assertEquals(SuccessfulAction::class, $action->context()->current_action());
+    }
 
-it('returns no context validation errors with empty expected keys', function() {
-    $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
+    public function test_it_returns_no_context_validation_errors_with_empty_expected_keys() {
+        $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 
-    expect($result->success())->toBeTrue();
-});
+        $this->assertTrue($result->success());
+    }
 
-it('can accept a single string for the expected key in the context', function() {
-    $result = SingleExpectsAndPromisesAction::execute(['a' => 1]);
+    public function test_it_can_accept_a_single_string_for_the_expected_key_in_the_context() {
+        $result = SingleExpectsAndPromisesAction::execute(['a' => 1]);
 
-    expect($result->b)->toEqual(2);
-});
+        $this->assertEquals(2, $result->b);
+    }
 
-it('throws an exception when all of the expected keys are not in the context', function() {
-    SuccessfulAction::execute([]);
-})->throws(ExpectedKeysNotInContextException::class);
+    public function test_it_throws_an_exception_when_all_of_the_expected_keys_are_not_in_the_context() {
+        $this->expectException(ExpectedKeysNotInContextException::class);
 
-it('throws an exception some of the expected keys are not in the context', function() {
-    SuccessfulAction::execute(['a' => 1]);
-})->throws(ExpectedKeysNotInContextException::class);
+        SuccessfulAction::execute([]);
+    }
 
-it('returns no context validation exceptions with empty promised keys', function() {
-    $result = NoMissingPromisesAction::execute(['a' => 1, 'b' => 2]);
+    public function test_it_throws_an_exception_some_of_the_expected_keys_are_not_in_the_context() {
+        $this->expectException(ExpectedKeysNotInContextException::class);
 
-    expect($result->success())->toBeTrue();
-});
+        SuccessfulAction::execute(['a' => 1]);
+    }
 
-it('throws an exception when all of the the promised keys are not in the context', function() {
-    MissingAllPromisesAction::execute(['a' => 1, 'b' => 2]);
-})->throws(PromisedKeysNotInContextException::class);
+    public function test_it_returns_no_context_validation_exceptions_with_empty_promised_keys() {
+        $result = NoMissingPromisesAction::execute(['a' => 1, 'b' => 2]);
 
-it('throws an exception some of the the promised keys are not in the context', function() {
-    MissingSomePromisesAction::execute(['a' => 1, 'b' => 2]);
-})->throws(PromisedKeysNotInContextException::class);
+        $this->assertTrue($result->success());
+    }
 
-it('throws an exception when the executed function is not implemented', function() {
-    NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
-})->throws(NotImplementedException::class);
+    public function test_it_throws_an_exception_when_all_of_the_the_promised_keys_are_not_in_the_context() {
+        $this->expectException(PromisedKeysNotInContextException::class);
 
-it('can skip to the next action using the next_context function', function() {
-    $result = NextActionAction::execute(['a' => 1, 'b' => 2]);
+        MissingAllPromisesAction::execute(['a' => 1, 'b' => 2]);
+    }
 
-    expect($result->failure())->toBeFalse();
-    expect($result->success())->toBeTrue();
-    expect($result->keys())->not()->toHaveKey('d');
-});
+    public function test_it_throws_an_exception_some_of_the_the_promised_keys_are_not_in_the_context() {
+        $this->expectException(PromisedKeysNotInContextException::class);
 
-it('can mark the current context as failed with a message using the fail function', function() {
-    $result = FailingAction::execute(['a' => 1, 'b' => 2]);
+        MissingSomePromisesAction::execute(['a' => 1, 'b' => 2]);
+    }
 
-    expect($result->failure())->toBeTrue();
-    expect($result->success())->toBeFalse();
-});
+    public function test_it_throws_an_exception_when_the_executed_function_is_not_implemented() {
+        $this->expectException(NotImplementedException::class);
 
-it('can mark the current context as failed and move onto the next context using the fail_and_return function', function() {
-    $result = FailAndReturnAction::execute();
+        NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
+    }
 
-    expect($result->failure())->toBeTrue();
-    expect($result->keys())->not()->toHaveKey('one');
-});
+    public function test_it_can_skip_to_the_next_action_using_the_next_context_function() {
+        $result = NextActionAction::execute(['a' => 1, 'b' => 2]);
 
-it('can get the current context', function() {
-    $action = new SuccessfulAction(['a' => 1]);
+        $this->assertFalse($result->failure());
+        $this->assertTrue($result->success());
+        $this->assertArrayNotHasKey('d', $result->keys());
+    }
 
-    expect($action->context()->to_array())->toEqual(['a' => 1]);
-});
+    public function test_it_can_mark_the_current_context_as_failed_with_a_message_using_the_fail_function() {
+        $result = FailingAction::execute(['a' => 1, 'b' => 2]);
 
-it('can get the expected keys', function() {
-    $action = new SuccessfulAction(['a' => 1]);
+        $this->assertTrue($result->failure());
+        $this->assertFalse($result->success());
+    }
 
-    expect($action->expected_keys())->toEqual(['a', 'b']);
-});
+    public function test_it_can_mark_the_current_context_as_failed_and_move_onto_the_next_context_using_the_fail_and_return_function() {
+        $result = FailAndReturnAction::execute();
 
-it('can fail the context and rollback', function() {
-    $result = RollbackAction::execute(['number' => 1]);
+        $this->assertTrue($result->failure());
+        $this->assertArrayNotHasKey('one', $result->keys());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 0]);
-    expect($result->message())->toEqual('I want to roll back!');
-});
+    public function test_it_can_get_the_current_context() {
+        $action = new SuccessfulAction(['a' => 1]);
 
-it('can fail the context and rollback statically with a given context', function() {
-    $result = RollbackAction::rollback(['number' => 1]);
+        $this->assertEquals(['a' => 1], $action->context()->to_array());
+    }
 
-    expect($result->to_array())->toEqual(['number' => 0]);
-});
+    public function test_it_can_get_the_expected_keys() {
+        $action = new SuccessfulAction(['a' => 1]);
+
+        $this->assertEquals(['a', 'b'], $action->expected_keys());
+    }
+
+    public function test_it_can_fail_the_context_and_rollback() {
+        $result = RollbackAction::execute(['number' => 1]);
+
+        $this->assertEquals(['number' => 0], $result->to_array());
+        $this->assertEquals('I want to roll back!', $result->message());
+    }
+
+    public function test_it_can_fail_the_context_and_rollback_statically_with_a_given_context() {
+        $result = RollbackAction::rollback(['number' => 1]);
+
+        $this->assertEquals(['number' => 0], $result->to_array());
+    }
+}

@@ -550,10 +550,6 @@ class AnotherAction {
 }
 ```
 
-### Logging
-
-TODO
-
 ### Error codes
 
 You can add some more structure to your error handling by taking advantage of error codes in the context. Normally, when something goes wrong in your actions, you fail the process by setting the context to failure:
@@ -824,7 +820,11 @@ In this case the organizer above adds some kv's into the context which the `Adds
 
 ### Context factory for faster action testing
 
-TODO
+TODO - This will come one day.
+
+### Logging
+
+TODO - This will come one day.
 
 ## Contributing
 

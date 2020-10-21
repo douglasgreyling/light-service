@@ -236,27 +236,25 @@ class LooksUpTaxPercentageAction {
   private $expects  = ['order'];
   private $promises = ['tax_percentage'];
 
-  private function executed() {
-    $order      = $this->context->order;
+  private function executed($context) {
+    $order      = $context->order;
     $tax_ranges = TaxRange::for_region($order->region);
 
-    $this->context->tax_percentage = 0;
+    $context->tax_percentage = 0;
 
     if (is_null($tax_ranges)) {
-      $this->context->fail('The tax ranges were not found');
+      $context->fail('The tax ranges were not found');
       $this->next_context();
     }
 
     $tax_percentage = $tax_ranges->for_total($order->total);
 
     if (is_null($tax_percentage)) {
-      $this->context->fail('The tax percentage were not found');
+      $context->fail('The tax percentage were not found');
       $this->next_context();
     }
 
-    $this
-      ->context
-      ->tax_percentage = $tax_percentage
+    $context->tax_percentage = $tax_percentage
   }
 }
 ```
@@ -269,9 +267,8 @@ class CalculatesOrderTaxAction {
 
   private $expects = ['order', 'tax_percentage'];
 
-  private function executed() {
-    $this
-      ->context
+  private function executed($context) {
+    $context
       ->order
       ->tax = round($order->total * ($tax_percentage/100), 2);
   }
@@ -286,11 +283,11 @@ class ProvidesFreeShippingAction {
 
   private $expects = ['order'];
 
-  private function executed() {
-    $total_with_tax = $this->context->order->total_with_tax;
+  private function executed($context) {
+    $total_with_tax = $context->order->total_with_tax;
 
     if ($total_with_tax > 200)) {
-      $this->context->order->provide_free_shipping;
+      $context->order->provide_free_shipping;
     }
   }
 }
@@ -642,7 +639,9 @@ The actions are rolled back in reversed order from the point of failure starting
 
 ### Orchestrator logic
 
-The Organizer - Action combination works really well for simple use cases. However, as business logic gets more complex, or when LightService is used in an ETL workflow, the code that routes the different organizers becomes very complex and imperative. Let's look at a piece of code that does basic data transformations:
+The Organizer - Action combination works really well for simple use cases. However, as business logic gets more complex, or when LightService is used in an ETL workflow, the code that routes the different organizers becomes very complex and imperative.
+
+Let's look at a piece of code that does basic data transformations:
 
 ```php
 class ExtractsTransformsLoadsData {

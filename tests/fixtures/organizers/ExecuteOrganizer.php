@@ -1,10 +1,11 @@
 <?php
 
-require_once 'src/organizer.php';
-require_once 'tests/fixtures/actions/AddsOneAction.php';
+namespace LightServicePHP\Fixtures\Organizers;
+
+use LightServicePHP\Fixtures\Actions\AddsOneAction;
 
 class ExecuteOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     public static function call($number) {
         return self::with(['number' => $number])->reduce(

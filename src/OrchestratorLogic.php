@@ -1,6 +1,8 @@
 <?php
 
-require_once 'src/Orchestrator.php';
+namespace LightServicePHP;
+
+use LightServicePHP\Orchestrator;
 
 use Doctrine\Inflector\InflectorFactory;
 use Doctrine\Inflector\Language;

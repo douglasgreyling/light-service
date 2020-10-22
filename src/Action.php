@@ -2,21 +2,13 @@
 
 namespace LightServicePHP;
 
-require_once 'Context.php';
+use LightServicePHP\Context;
 
-require_once 'exceptions/ExpectedKeysNotInContextException.php';
-require_once 'exceptions/NextActionException.php';
-require_once 'exceptions/NotImplementedException.php';
-require_once 'exceptions/PromisedKeysNotInContextException.php';
-require_once 'exceptions/RollbackException.php';
-
-use Context;
-
-use ExpectedKeysNotInContextException;
-use NextActionException;
-use NotImplementedException;
-use PromisedKeysNotInContextException;
-use RollbackException;
+use LightServicePHP\Exception\ExpectedKeysNotInContextException;
+use LightServicePHP\Exception\PromisedKeysNotInContextException;
+use LightServicePHP\Exception\NextActionException;
+use LightServicePHP\Exception\RollbackException;
+use LightServicePHP\Exception\NotImplementedException;
 
 trait Action {
     private $context;

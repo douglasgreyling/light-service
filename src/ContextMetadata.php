@@ -1,5 +1,9 @@
 <?php
 
+namespace LightServicePHP;
+
+use Exception;
+
 class ContextMetadata {
     const DEFAULT_METADATA = [
         'failure'           => false,

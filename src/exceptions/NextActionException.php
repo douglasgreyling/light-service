@@ -1,6 +1,8 @@
 <?php
 
-require_once 'src/exceptions/ContextException.php';
+namespace LightServicePHP\Exception;
+
+use LightServicePHP\Exception\ContextException;
 
 class NextActionException extends ContextException {
     //

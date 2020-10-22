@@ -1,10 +1,11 @@
 <?php
 
-require_once 'src/organizer.php';
-require_once 'tests/fixtures/actions/DoesNothingAction.php';
+namespace LightServicePHP\Fixtures\Organizers;
+
+use LightServicePHP\Fixtures\Actions\DoesNothingAction;
 
 class AllHooksOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     public function around_each() {
         $this->context->hooks_called[] = 'around';

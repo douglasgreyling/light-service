@@ -1,9 +1,9 @@
 <?php
 
-require_once 'src/Action.php';
+namespace LightServicePHP\Fixtures\Actions;
 
 class SkipRemainingAction {
-    use LightServicePHP\Action;
+    use \LightServicePHP\Action;
 
     private function executed($context) {
         $context->skip_remaining("Skipped remaining actions");

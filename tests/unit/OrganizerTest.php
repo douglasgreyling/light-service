@@ -2,25 +2,27 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once 'tests/fixtures/organizers/NoCallFunctionOrganizer.php';
-require_once 'tests/fixtures/organizers/DoesNothingOrganizer.php';
-require_once 'tests/fixtures/organizers/SuccessfulOrganizer.php';
-require_once 'tests/fixtures/organizers/OneSkipOrganizer.php';
-require_once 'tests/fixtures/organizers/FailingOrganizer.php';
-require_once 'tests/fixtures/organizers/SkipRemainingOrganizer.php';
-require_once 'tests/fixtures/organizers/BeforeAfterEachOrganizer.php';
-require_once 'tests/fixtures/organizers/AroundEachOrganizer.php';
-require_once 'tests/fixtures/organizers/AllHooksOrganizer.php';
-require_once 'tests/fixtures/organizers/KeyAliasesOrganizer.php';
-require_once 'tests/fixtures/organizers/RollbackOrganizer.php';
-require_once 'tests/fixtures/organizers/ReduceIfOrganizer.php';
-require_once 'tests/fixtures/organizers/ReduceUntilOrganizer.php';
-require_once 'tests/fixtures/organizers/ExecuteOrganizer.php';
-require_once 'tests/fixtures/organizers/AddToContextOrganizer.php';
-require_once 'tests/fixtures/organizers/RollbackOrchestratorLogicOrganizer.php';
-require_once 'tests/fixtures/organizers/FailingOrchestratorLogicOrganizer.php';
-require_once 'tests/fixtures/organizers/SkipRemainingOrchestratorLogicOrganizer.php';
-require_once 'tests/fixtures/organizers/IterateOrganizer.php';
+use LightServicePHP\Exception\NotImplementedException;
+
+use LightServicePHP\Fixtures\Organizers\AddToContextOrganizer;
+use LightServicePHP\Fixtures\Organizers\AllHooksOrganizer;
+use LightServicePHP\Fixtures\Organizers\AroundEachOrganizer;
+use LightServicePHP\Fixtures\Organizers\BeforeAfterEachOrganizer;
+use LightServicePHP\Fixtures\Organizers\DoesNothingOrganizer;
+use LightServicePHP\Fixtures\Organizers\ExecuteOrganizer;
+use LightServicePHP\Fixtures\Organizers\FailingOrchestratorLogicOrganizer;
+use LightServicePHP\Fixtures\Organizers\FailingOrganizer;
+use LightServicePHP\Fixtures\Organizers\IterateOrganizer;
+use LightServicePHP\Fixtures\Organizers\KeyAliasesOrganizer;
+use LightServicePHP\Fixtures\Organizers\NoCallFunctionOrganizer;
+use LightServicePHP\Fixtures\Organizers\OneSkipOrganizer;
+use LightServicePHP\Fixtures\Organizers\ReduceIfOrganizer;
+use LightServicePHP\Fixtures\Organizers\ReduceUntilOrganizer;
+use LightServicePHP\Fixtures\Organizers\RollbackOrchestratorLogicOrganizer;
+use LightServicePHP\Fixtures\Organizers\RollbackOrganizer;
+use LightServicePHP\Fixtures\Organizers\SkipRemainingOrchestratorLogicOrganizer;
+use LightServicePHP\Fixtures\Organizers\SkipRemainingOrganizer;
+use LightServicePHP\Fixtures\Organizers\SuccessfulOrganizer;
 
 final class OrganizerTest extends TestCase {
     public function test_it_throws_an_error_when_the_call_function_is_not_implemented() {

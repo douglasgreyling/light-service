@@ -2,17 +2,11 @@
 
 namespace LightServicePHP;
 
-require_once 'Context.php';
-require_once 'Orchestrator.php';
+use LightServicePHP\Context;
+use LightServicePHP\Orchestrator;
+use LightServicePHP\OrchestratorLogic;
 
-require_once 'exceptions/NotImplementedException.php';
-require_once 'src/OrchestratorLogic.php';
-
-use Context;
-use Orchestrator;
-use OrchestratorLogic;
-
-use NotImplementedException;
+use LightServicePHP\Exception\NotImplementedException;
 
 trait Organizer {
     use OrchestratorLogic;

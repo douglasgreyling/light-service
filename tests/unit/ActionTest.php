@@ -2,17 +2,23 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once 'tests/fixtures/actions/MissingAllPromisesAction.php';
-require_once 'tests/fixtures/actions/MissingSomePromisesAction.php';
-require_once 'tests/fixtures/actions/NextActionAction.php';
-require_once 'tests/fixtures/actions/NoExecutedFunctionAction.php';
-require_once 'tests/fixtures/actions/NoMissingExpectsAction.php';
-require_once 'tests/fixtures/actions/NoMissingPromisesAction.php';
-require_once 'tests/fixtures/actions/SuccessfulAction.php';
-require_once 'tests/fixtures/actions/UnexpectedErrorAction.php';
-require_once 'tests/fixtures/actions/FailAndReturnAction.php';
-require_once 'tests/fixtures/actions/SingleExpectsAndPromisesAction.php';
-require_once 'tests/fixtures/actions/KeyAliasesAction.php';
+use LightServicePHP\Context;
+
+use LightServicePHP\Exception\ExpectedKeysNotInContextException;
+use LightServicePHP\Exception\PromisedKeysNotInContextException;
+use LightServicePHP\Exception\NotImplementedException;
+
+use LightServicePHP\Fixtures\Actions\FailAndReturnAction;
+use LightServicePHP\Fixtures\Actions\FailingAction;
+use LightServicePHP\Fixtures\Actions\MissingAllPromisesAction;
+use LightServicePHP\Fixtures\Actions\MissingSomePromisesAction;
+use LightServicePHP\Fixtures\Actions\NoExecutedFunctionAction;
+use LightServicePHP\Fixtures\Actions\NextActionAction;
+use LightServicePHP\Fixtures\Actions\NoMissingExpectsAction;
+use LightServicePHP\Fixtures\Actions\NoMissingPromisesAction;
+use LightServicePHP\Fixtures\Actions\RollbackAction;
+use LightServicePHP\Fixtures\Actions\SingleExpectsAndPromisesAction;
+use LightServicePHP\Fixtures\Actions\SuccessfulAction;
 
 final class ActionTest extends TestCase {
     public function test_it_can_be_instantiated_with_an_associated_array_as_context() {

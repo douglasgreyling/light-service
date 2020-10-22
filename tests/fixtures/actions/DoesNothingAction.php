@@ -1,9 +1,9 @@
 <?php
 
-require_once 'src/Action.php';
+namespace LightServicePHP\Fixtures\Actions;
 
 class DoesNothingAction {
-    use LightServicePHP\Action;
+    use \LightServicePHP\Action;
 
     private function executed($context) {
         //

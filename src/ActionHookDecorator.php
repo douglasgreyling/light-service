@@ -1,5 +1,7 @@
 <?php
 
+namespace LightServicePHP;
+
 class ActionHookDecorator {
     public static function decorate($before_callback, $action_callback, $after_callback) {
         return function() use ($before_callback, $action_callback, $after_callback) {

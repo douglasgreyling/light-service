@@ -2,6 +2,20 @@
 
 use PHPUnit\Framework\TestCase;
 
+use LightServicePHP\Orchestrator;
+
+use LightServicePHP\Fixtures\Actions\AddsOneAction;
+use LightServicePHP\Fixtures\Actions\FailingAction;
+use LightServicePHP\Fixtures\Actions\KeyAliasesAction;
+use LightServicePHP\Fixtures\Actions\RollbackAction;
+use LightServicePHP\Fixtures\Actions\SkipRemainingAction;
+
+use LightServicePHP\Fixtures\Organizers\FailingOrganizer;
+use LightServicePHP\Fixtures\Organizers\KeyAliasesOrganizer;
+use LightServicePHP\Fixtures\Organizers\RollbackOrganizer;
+use LightServicePHP\Fixtures\Organizers\SkipRemainingOrganizer;
+use LightServicePHP\Fixtures\Organizers\SuccessfulOrganizer;
+
 final class OrchestratorTest extends TestCase {
     public function test_it_can_run_through_a_list_of_actions_belonging_to_an_organizer() {
         $action_orchestrator = new Orchestrator(

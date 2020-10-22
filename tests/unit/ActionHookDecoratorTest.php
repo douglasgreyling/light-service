@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once 'src/ActionHookDecorator.php';
+use LightServicePHP\ActionHookDecorator;
 
 final class ActionHookDecoratorTest extends TestCase {
     public function test_it_wraps_before_and_after_callbacks_around_a_function() {

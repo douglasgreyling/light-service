@@ -1,9 +1,16 @@
 <?php
 
-require_once 'src/exceptions/RollbackException.php';
-require_once 'ContextMetadata.php';
+namespace LightServicePHP;
 
-class Context extends stdClass {
+use Exception;
+
+use LightServicePHP\ContextMetadata;
+
+use LightServicePHP\Exception\NextActionException;
+use LightServicePHP\Exception\RollbackException;
+use LightServicePHP\Exception\KeyAliasException;
+
+class Context extends \stdClass {
     public function __construct($context = []) {
         $this->setup_context($context);
         $this->_metadata = new ContextMetadata();

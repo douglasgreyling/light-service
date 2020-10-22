@@ -1,11 +1,11 @@
 <?php
 
-require_once 'src/organizer.php';
+namespace LightServicePHP\Fixtures\Organizers;
 
-require_once 'tests/fixtures/actions/SetsAAction.php';
+use LightServicePHP\Fixtures\Actions\SetsAAction;
 
 class AroundHooksOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     public function around_each($context) {
         $context->a[] = 'around';
@@ -13,7 +13,7 @@ class AroundHooksOrganizer {
 
     public static function call() {
         return self::with(['a' => []])->reduce(
-            Action::class
+            SetsAAction::class
         );
     }
 }

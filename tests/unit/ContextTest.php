@@ -2,9 +2,10 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once 'src/Context.php';
-require_once 'src/exceptions/NextActionException.php';
-require_once 'src/exceptions/KeyAliasException.php';
+use LightServicePHP\Context;
+
+use LightServicePHP\Exception\NextActionException;
+use LightServicePHP\Exception\KeyAliasException;
 
 final class ContextTest extends TestCase {
     public function test_it_is_instantiated_with_an_empty_context_when_given_no_state() {

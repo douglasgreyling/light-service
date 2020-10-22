@@ -1,11 +1,12 @@
 <?php
 
-require_once 'src/organizer.php';
-require_once 'tests/fixtures/actions/KeyAliasesAction.php';
-require_once 'tests/fixtures/actions/AddsOneAction.php';
+namespace LightServicePHP\Fixtures\Organizers;
+
+use LightServicePHP\Fixtures\Actions\AddsOneAction;
+use LightServicePHP\Fixtures\Actions\KeyAliasesAction;
 
 class KeyAliasesOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     private $aliases = ['number' => 'num_alias'];
 

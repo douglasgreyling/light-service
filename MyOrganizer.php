@@ -1,8 +1,5 @@
 <?php
 
-require_once 'src/organizer.php';
-require_once 'src/action.php';
-
 class CalculatesTax {
     use LightServicePHP\Organizer;
 

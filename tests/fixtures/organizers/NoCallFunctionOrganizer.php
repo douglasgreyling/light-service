@@ -1,7 +1,7 @@
 <?php
 
-require_once 'src/organizer.php';
+namespace LightServicePHP\Fixtures\Organizers;
 
 class NoCallFunctionOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 }

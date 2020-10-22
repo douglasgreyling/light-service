@@ -1,10 +1,11 @@
 <?php
 
-require_once 'src/organizer.php';
-require_once 'tests/fixtures/actions/DoesNothingAction.php';
+namespace LightServicePHP\Fixtures\Organizers;
+
+use LightServicePHP\Fixtures\Actions\DoesNothingAction;
 
 class BeforeAfterEachOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     public static function call() {
         return self::with(['hooks_called' => []])->reduce(

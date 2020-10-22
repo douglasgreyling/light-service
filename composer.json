@@ -4,6 +4,14 @@
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "LightServicePHP\\": "src/",
+      "LightServicePHP\\Exception\\": "src/exceptions",
+      "LightServicePHP\\Fixtures\\Actions\\": "tests/fixtures/actions",
+      "LightServicePHP\\Fixtures\\Organizers\\": "tests/fixtures/organizers"
+    }
+  },
   "require": {
     "doctrine/inflector": "^2.0"
   }

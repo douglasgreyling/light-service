@@ -1,11 +1,11 @@
 <?php
 
-require_once 'src/organizer.php';
+namespace LightServicePHP\Fixtures\Organizers;
 
-require_once 'tests/fixtures/actions/SetsAAction.php';
+use LightServicePHP\Fixtures\Actions\SetsAAction;
 
 class BeforeAfterHooksOrganizer {
-    use LightServicePHP\Organizer;
+    use \LightServicePHP\Organizer;
 
     public function before_each($context) {
         $context->a[] = 'before';
@@ -17,7 +17,7 @@ class BeforeAfterHooksOrganizer {
 
     public static function call() {
         return self::with(['a' => []])->reduce(
-            Action::class
+            SetsAAction::class
         );
     }
 }

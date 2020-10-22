@@ -1,10 +1,12 @@
 <?php
 
-require_once 'ActionHookWrapper.php';
-require_once 'src/exceptions/RollbackException.php';
+namespace LightServicePHP;
+
+use LightServicePHP\ActionHookWrapper;
+
+use LightServicePHP\Exception\RollbackException;
 
 class Orchestrator {
-    private $actions;
     private $organizer;
     private $context;
 

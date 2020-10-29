@@ -31,6 +31,8 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
   test:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Run PHPUnit tests
         run: composer test

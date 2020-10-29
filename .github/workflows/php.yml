@@ -31,7 +31,7 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run PHPUnit tests
-        run: ./vendor/bin/phpunit --coverage-clover coverage.xml
+        run: ./vendor/bin/phpunit tests --coverage-clover coverage.xml
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash)

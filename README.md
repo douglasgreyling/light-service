@@ -110,7 +110,9 @@ PHP 7.3+ is required 😅
 
 ### Installation:
 
-TODO
+```
+composer require douglasgreyling/light-service
+```
 
 ### Your first action:
 

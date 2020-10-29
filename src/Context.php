@@ -41,13 +41,7 @@ class Context extends \stdClass {
     }
 
     public function fetch($keys) {
-        $context     = $this->to_array();
-        $key_aliases = $this->_metadata->key_aliases;
-
-        foreach($key_aliases as $key => $key_alias)
-            $context[$key_alias] = $context[$key];
-
-        return array_intersect_key($context, array_flip($keys));
+        return array_intersect_key($this->to_array(), array_flip($keys));
     }
 
     public function keys() {
@@ -66,13 +60,7 @@ class Context extends \stdClass {
     }
 
     public function &__get($key)  {
-        // Return null instead of raising an exception
-        // if a key is not found
-        try {
-            return $this->$key;
-        } catch (Exception $e) {
-            return null;
-        }
+        return $this->$key;
     }
 
     public function array_merge($kvs) {

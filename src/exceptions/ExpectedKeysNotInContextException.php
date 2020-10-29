@@ -5,7 +5,7 @@ namespace LightService\Exception;
 use Exception;
 
 class ExpectedKeysNotInContextException extends Exception {
-    public function errorMessage($expected_keys) {
-        return 'Expected the following keys to be in context: ' . $expected_keys;
+    public function __construct($message = null, $code = 0, Exception $previous = null) {
+        $this->message = 'The following keys were expected to be in context: ' . $message;
     }
 }

@@ -43,25 +43,9 @@ final class ContextMetadataTest extends TestCase {
         $this->assertEquals(100, $context_metadata->error_code);
     }
 
-    public function test_it_returns_the_inverse_key_for_a_given_alias_key_when_it_exists() {
-        $context_metadata = new ContextMetadata();
+    public function test_it_returns_a_value_of_null_when_the_property_being_fetched_does_not_exist_in_the_context_metadata() {
+        $context = new ContextMetadata();
 
-        $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
-
-        $this->assertEquals('a', $context_metadata->invert_alias('an_alias_for_a'));
-    }
-
-    public function test_it_returns_null_for_a_given_alias_key_when_it_does_not_exist() {
-        $context_metadata = new ContextMetadata();
-
-        $this->assertNull($context_metadata->invert_alias('an_alias_for_a'));
-    }
-
-    public function test_it_can_determine_if_a_given_key_alias_exists() {
-        $context_metadata = new ContextMetadata();
-
-        $context_metadata->key_aliases = ['a' => 'an_alias_for_a'];
-
-        $this->assertTrue($context_metadata->alias_exists('an_alias_for_a'));
+        $this->assertNull($context->b);
     }
 }

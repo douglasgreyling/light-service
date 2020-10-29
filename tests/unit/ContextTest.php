@@ -56,7 +56,6 @@ final class ContextTest extends TestCase {
                     'skip_remaining'    => false,
                     'current_action'    => '',
                     'current_organizer' => '',
-                    'key_aliases'       => [],
                     'rollback'          => false,
                     'executed_actions'  => []
                 ]
@@ -99,6 +98,14 @@ final class ContextTest extends TestCase {
         $context = new Context(['a' => 1]);
 
         $context->merge(['b' => 2, 'c' => 3]);
+
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->to_array());
+    }
+
+    public function test_it_can_merge_a_set_of_key_value_pairs_into_the_context_using_the_array_merge_function() {
+        $context = new Context(['a' => 1]);
+
+        $context->array_merge(['b' => 2, 'c' => 3]);
 
         $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->to_array());
     }
@@ -218,5 +225,15 @@ final class ContextTest extends TestCase {
         $this->assertTrue($context->failure());
         $this->assertEquals('Something went wrong', $context->message());
         $this->assertEquals(4001, $context->error_code());
+    }
+
+    public function test_it_sets_a_undefined_key_with_a_value_of_null_when_called_for_the_first_time() {
+        $context = new Context();
+
+        $result = $context->foo;
+        // $context->__get('bar');
+
+        // $this->assertEquals(['foo' => null], $context->to_array());
+        $this->assertNull($result);
     }
 }

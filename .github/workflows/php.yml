@@ -31,6 +31,6 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
   test:
-    steps
+    steps:
       - name: Run PHPUnit tests
         run: composer test

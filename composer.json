@@ -19,5 +19,6 @@
   },
   "scripts": {
     "test": "phpunit"
-  }
+  },
+  "license": "MIT"
 }

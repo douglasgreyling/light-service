@@ -20,5 +20,10 @@
   "scripts": {
     "test": "./vendor/bin/phpunit"
   },
+  "config": {
+    "preferred-install": {
+        "*": "dist"
+    }
+  },
   "license": "MIT"
 }

@@ -1,4 +1,6 @@
-# LightService-PHP:
+# LightService:
+
+[![build Actions Status](https://github.com/douglasgreyling/light-service/workflows/build/badge.svg)](https://github.com/douglasgreyling/light-service/actions)
 
 A service object framework heavily, heavily, heavily inspired by the [LightService](https://github.com/adomokos/light-service) Ruby gem.
 

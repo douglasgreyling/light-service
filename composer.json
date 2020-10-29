@@ -18,7 +18,7 @@
     "doctrine/inflector": "^2.0"
   },
   "scripts": {
-    "test": "phpunit"
+    "test": "./vendor/bin/phpunit"
   },
   "license": "MIT"
 }

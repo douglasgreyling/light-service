@@ -1,8 +1,8 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
-use LightServicePHP\ActionHookDecorator;
+use LightService\ActionHookDecorator;
 
 class ActionHookWrapper {
     public static function wrap($action, $organizer) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace LightServicePHP\Exception;
+namespace LightService\Exception;
 
 use Exception;
 

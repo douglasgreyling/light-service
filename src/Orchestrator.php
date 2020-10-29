@@ -1,10 +1,10 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
-use LightServicePHP\ActionHookWrapper;
+use LightService\ActionHookWrapper;
 
-use LightServicePHP\Exception\RollbackException;
+use LightService\Exception\RollbackException;
 
 class Orchestrator {
     private $organizer;

@@ -3,7 +3,7 @@
 require 'src/action.php';
 
 class MyAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private static function expects() {
     return ['a', 'b'];

@@ -1,9 +1,9 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Actions;
+namespace LightService\Fixtures\Actions;
 
 class FailingAction {
-    use \LightServicePHP\Action;
+    use \LightService\Action;
 
     private function executed($context) {
         $context->fail('foo');

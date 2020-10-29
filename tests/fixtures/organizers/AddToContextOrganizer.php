@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\AddsOneAction;
+use LightService\Fixtures\Actions\AddsOneAction;
 
 class AddToContextOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call() {
         return self::with([])->reduce(

@@ -1,9 +1,9 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Actions;
+namespace LightService\Fixtures\Actions;
 
 class SkipRemainingAction {
-    use \LightServicePHP\Action;
+    use \LightService\Action;
 
     private function executed($context) {
         $context->skip_remaining("Skipped remaining actions");

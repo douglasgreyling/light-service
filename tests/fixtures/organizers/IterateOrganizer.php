@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\IterateAction;
+use LightService\Fixtures\Actions\IterateAction;
 
 class IterateOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call($context) {
         return self::with($context)->reduce(

@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\SetsAAction;
+use LightService\Fixtures\Actions\SetsAAction;
 
 class AroundHooksOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public function around_each($context) {
         $context->a[] = 'around';

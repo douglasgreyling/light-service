@@ -1,6 +1,6 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
 class ActionHookDecorator {
     public static function decorate($before_callback, $action_callback, $after_callback) {

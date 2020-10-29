@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Actions;
+namespace LightService\Fixtures\Actions;
 
 use Exception;
 
 class UnexpectedErrorAction {
-    use \LightServicePHP\Action;
+    use \LightService\Action;
 
     private $expects  = ['a', 'b'];
     private $promises = ['c'];

@@ -1,9 +1,9 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Actions;
+namespace LightService\Fixtures\Actions;
 
 class NextActionAction {
-    use \LightServicePHP\Action;
+    use \LightService\Action;
 
     private function executed($context) {
         $this->next_context();

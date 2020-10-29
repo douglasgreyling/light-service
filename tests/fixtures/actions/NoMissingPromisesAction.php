@@ -1,9 +1,9 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Actions;
+namespace LightService\Fixtures\Actions;
 
 class NoMissingPromisesAction {
-    use \LightServicePHP\Action;
+    use \LightService\Action;
 
     private $expects = ['a', 'b'];
 

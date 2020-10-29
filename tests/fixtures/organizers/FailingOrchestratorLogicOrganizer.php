@@ -1,12 +1,12 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\AddsOneAction;
-use LightServicePHP\Fixtures\Actions\FailingAction;
+use LightService\Fixtures\Actions\AddsOneAction;
+use LightService\Fixtures\Actions\FailingAction;
 
 class FailingOrchestratorLogicOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call($number) {
         return self::with(['number' => $number])->reduce(

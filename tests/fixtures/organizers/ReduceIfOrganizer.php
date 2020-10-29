@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\AddsOneAction;
+use LightService\Fixtures\Actions\AddsOneAction;
 
 class ReduceIfOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call($number) {
         return self::with(['number' => $number])->reduce(

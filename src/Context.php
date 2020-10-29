@@ -1,14 +1,14 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
 use Exception;
 
-use LightServicePHP\ContextMetadata;
+use LightService\ContextMetadata;
 
-use LightServicePHP\Exception\NextActionException;
-use LightServicePHP\Exception\RollbackException;
-use LightServicePHP\Exception\KeyAliasException;
+use LightService\Exception\NextActionException;
+use LightService\Exception\RollbackException;
+use LightService\Exception\KeyAliasException;
 
 class Context extends \stdClass {
     public function __construct($context = []) {

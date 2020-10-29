@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\DoesNothingAction;
+use LightService\Fixtures\Actions\DoesNothingAction;
 
 class BeforeAfterEachOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call() {
         return self::with(['hooks_called' => []])->reduce(

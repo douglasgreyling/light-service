@@ -2,23 +2,23 @@
 
 use PHPUnit\Framework\TestCase;
 
-use LightServicePHP\Context;
+use LightService\Context;
 
-use LightServicePHP\Exception\ExpectedKeysNotInContextException;
-use LightServicePHP\Exception\PromisedKeysNotInContextException;
-use LightServicePHP\Exception\NotImplementedException;
+use LightService\Exception\ExpectedKeysNotInContextException;
+use LightService\Exception\PromisedKeysNotInContextException;
+use LightService\Exception\NotImplementedException;
 
-use LightServicePHP\Fixtures\Actions\FailAndReturnAction;
-use LightServicePHP\Fixtures\Actions\FailingAction;
-use LightServicePHP\Fixtures\Actions\MissingAllPromisesAction;
-use LightServicePHP\Fixtures\Actions\MissingSomePromisesAction;
-use LightServicePHP\Fixtures\Actions\NoExecutedFunctionAction;
-use LightServicePHP\Fixtures\Actions\NextActionAction;
-use LightServicePHP\Fixtures\Actions\NoMissingExpectsAction;
-use LightServicePHP\Fixtures\Actions\NoMissingPromisesAction;
-use LightServicePHP\Fixtures\Actions\RollbackAction;
-use LightServicePHP\Fixtures\Actions\SingleExpectsAndPromisesAction;
-use LightServicePHP\Fixtures\Actions\SuccessfulAction;
+use LightService\Fixtures\Actions\FailAndReturnAction;
+use LightService\Fixtures\Actions\FailingAction;
+use LightService\Fixtures\Actions\MissingAllPromisesAction;
+use LightService\Fixtures\Actions\MissingSomePromisesAction;
+use LightService\Fixtures\Actions\NoExecutedFunctionAction;
+use LightService\Fixtures\Actions\NextActionAction;
+use LightService\Fixtures\Actions\NoMissingExpectsAction;
+use LightService\Fixtures\Actions\NoMissingPromisesAction;
+use LightService\Fixtures\Actions\RollbackAction;
+use LightService\Fixtures\Actions\SingleExpectsAndPromisesAction;
+use LightService\Fixtures\Actions\SuccessfulAction;
 
 final class ActionTest extends TestCase {
     public function test_it_can_be_instantiated_with_an_associated_array_as_context() {

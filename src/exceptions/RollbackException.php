@@ -1,8 +1,8 @@
 <?php
 
-namespace LightServicePHP\Exception;
+namespace LightService\Exception;
 
-use LightServicePHP\Exception\ContextException;
+use LightService\Exception\ContextException;
 
 class RollbackException extends ContextException {
     //

@@ -115,7 +115,7 @@ Let's make a simple greeting action.
 
 ```php
 class GreetsSomeoneAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects  = ['name'];
   private $promises = ['greeting'];
@@ -154,7 +154,7 @@ Before we create out organizer, let's create one more action:
 
 ```php
 class FeedsSomeoneAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects = ['name'];
 
@@ -170,7 +170,7 @@ Now let's create our organizer like this:
 
 ```php
 class GreetsAndFeedsSomeone {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($name) {
     return self::with(['name' => $name])->reduce(
@@ -215,7 +215,7 @@ We'll begin by looking at the controller. We want to look for distinct steps whi
 
 ```php
 class CalculatesTax {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($order) {
     return self::with(['order' => $order])->reduce(
@@ -231,7 +231,7 @@ class CalculatesTax {
 
 ```php
 class LooksUpTaxPercentageAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects  = ['order'];
   private $promises = ['tax_percentage'];
@@ -263,7 +263,7 @@ class LooksUpTaxPercentageAction {
 
 ```php
 class CalculatesOrderTaxAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects = ['order', 'tax_percentage'];
 
@@ -279,7 +279,7 @@ class CalculatesOrderTaxAction {
 
 ```php
 class ProvidesFreeShippingAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects = ['order'];
 
@@ -332,7 +332,7 @@ Here's an example:
 
 ```php
 class SubmitsOrderAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     if (!$context->order->submit_order_successful()) {
@@ -355,7 +355,7 @@ You can skip the rest of the actions by calling `skip_remaining()` on the contex
 
 ```php
 class ChecksOrderStatusAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     if ($context->order->must_send_notification()) {
@@ -377,7 +377,7 @@ Consider this code:
 
 ```php
 class SomeOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($context) {
     return self::with($context)->reduce(...self::actions());
@@ -393,7 +393,7 @@ class SomeOrganizer {
 }
 
 class TwoAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     if ($context->user->role == 'admin')
@@ -415,7 +415,7 @@ This is how you can declaratively add before and after hooks to the organizer:
 
 ```php
 class SomeOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public function before_each($context) {
     if ($context->current_action() == TwoAction::class) {
@@ -449,7 +449,7 @@ class SomeOrganizer {
 }
 
 class TwoAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     $context->user->do_something();
@@ -467,7 +467,7 @@ This is how it's used:
 
 ```php
 class FooAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private expects  = ['a', 'b'];
   private promises = ['c'];
@@ -482,7 +482,7 @@ For those who are utterly slothful, you can also set the `expects` and `promises
 
 ```php
 class FooAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private expects  = 'a';
   private promises = 'b';
@@ -517,7 +517,7 @@ Say for example you have actions `AnAction` and `AnotherAction` that you've used
 
 ```php
 class AnOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   private $aliases = ['my_key' => 'key_alias'];
 
@@ -530,7 +530,7 @@ class AnOrganizer {
 }
 
 class AnAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $promises = 'my_key';
 
@@ -540,7 +540,7 @@ class AnAction {
 }
 
 class AnotherAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects = 'key_alias';
 
@@ -556,7 +556,7 @@ You can add some more structure to your error handling by taking advantage of er
 
 ```php
 class SomeAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     $context->fail("I don't like what happened here.");
@@ -568,7 +568,7 @@ However, you might need to handle the errors coming from your action pipeline di
 
 ```php
 class SomeAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     if (95 < $context->teapot->heat())
@@ -600,7 +600,7 @@ Sometimes your action has to undo what it did when an error occurs. Think about 
 
 ```php
 class SaveEntities {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects = 'user';
 
@@ -618,7 +618,7 @@ You need to call the `fail_with_rollback` function to initiate a rollback for ac
 
 ```php
 class CallSomeExternalAPI {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private function executed($context) {
     $api_call_result = SomeAPI::save_user($context->user);
@@ -668,7 +668,7 @@ Let's see how we could make it a bit more simpler with a declarative style:
 
 ```php
 class ExtractsTransformsLoadsData {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($connection) {
     return self::with(['connection' => $connection])->reduce(...self::actions());
@@ -702,7 +702,7 @@ The 5 different orchestrator constructs an organizer can have:
 
 ```php
 class ReduceUntilOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($number) {
     return self::with(['number' => $number])->reduce(
@@ -726,7 +726,7 @@ In this case the organizer above takes a number, executes a couple of actions be
 
 ```php
 class ReduceIfOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($number) {
     return self::with(['number' => $number])->reduce(
@@ -753,7 +753,7 @@ The organizer will singularize the key name and will put the actual item into th
 
 ```php
 class IterateOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($context) {
     return self::with($context)->reduce(
@@ -765,7 +765,7 @@ class IterateOrganizer {
 }
 
 class IterateAction {
-  use LightServicePHP\Action;
+  use LightService\Action;
 
   private $expects  = ['number'];
   private $promises = ['number'];
@@ -786,7 +786,7 @@ That seems a lot of ceremony for a simple change. You can do that in an `execute
 
 ```php
 class ExecuteOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call($number) {
     return self::with(['number' => $number])->reduce(
@@ -805,7 +805,7 @@ In this case the organizer above simply changes the context in some way defined 
 
 ```php
 class AddToContextOrganizer {
-  use LightServicePHP\Organizer;
+  use LightService\Organizer;
 
   public static function call() {
     return self::with([])->reduce(

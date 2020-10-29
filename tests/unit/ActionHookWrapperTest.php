@@ -2,9 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 
-use LightServicePHP\Fixtures\Organizers\AllHooksOrganizer;
-use LightServicePHP\Fixtures\Organizers\AroundHooksOrganizer;
-use LightServicePHP\Fixtures\Organizers\BeforeAfterHooksOrganizer;
+use LightService\Fixtures\Organizers\AllHooksOrganizer;
+use LightService\Fixtures\Organizers\AroundHooksOrganizer;
+use LightService\Fixtures\Organizers\BeforeAfterHooksOrganizer;
 
 final class ActionHookWrapperTest extends TestCase {
     public function test_it_wraps_an_organizers_before_and_after_hooks_around_an_action() {

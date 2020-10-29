@@ -1,11 +1,11 @@
 <?php
 
-namespace LightServicePHP\Fixtures\Organizers;
+namespace LightService\Fixtures\Organizers;
 
-use LightServicePHP\Fixtures\Actions\DoesNothingAction;
+use LightService\Fixtures\Actions\DoesNothingAction;
 
 class AroundEachOrganizer {
-    use \LightServicePHP\Organizer;
+    use \LightService\Organizer;
 
     public static function call() {
         return self::with(['hook_count' => 0])->reduce(

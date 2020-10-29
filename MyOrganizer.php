@@ -1,7 +1,7 @@
 <?php
 
 class CalculatesTax {
-    use LightServicePHP\Organizer;
+    use LightService\Organizer;
 
     public static function call($number) {
         return self::with(['num' => $number])->reduce(
@@ -12,7 +12,7 @@ class CalculatesTax {
 }
 
 class AddsOneAction {
-    use LightServicePHP\Action;
+    use LightService\Action;
 
     private $expects  = ['num'];
     private $promises = ['num'];
@@ -23,7 +23,7 @@ class AddsOneAction {
 }
 
 class AddsTwoAction {
-    use LightServicePHP\Action;
+    use LightService\Action;
 
     private $expects  = ['num'];
     private $promises = ['num'];

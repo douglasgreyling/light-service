@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use LightServicePHP\ContextMetadata;
+use LightService\ContextMetadata;
 
 final class ContextMetadataTest extends TestCase {
     public function test_it_is_instantiated_with_the_default_metadata_values() {

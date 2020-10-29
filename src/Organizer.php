@@ -1,12 +1,12 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
-use LightServicePHP\Context;
-use LightServicePHP\Orchestrator;
-use LightServicePHP\OrchestratorLogic;
+use LightService\Context;
+use LightService\Orchestrator;
+use LightService\OrchestratorLogic;
 
-use LightServicePHP\Exception\NotImplementedException;
+use LightService\Exception\NotImplementedException;
 
 trait Organizer {
     use OrchestratorLogic;

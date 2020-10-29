@@ -1,14 +1,14 @@
 <?php
 
-namespace LightServicePHP;
+namespace LightService;
 
-use LightServicePHP\Context;
+use LightService\Context;
 
-use LightServicePHP\Exception\ExpectedKeysNotInContextException;
-use LightServicePHP\Exception\PromisedKeysNotInContextException;
-use LightServicePHP\Exception\NextActionException;
-use LightServicePHP\Exception\RollbackException;
-use LightServicePHP\Exception\NotImplementedException;
+use LightService\Exception\ExpectedKeysNotInContextException;
+use LightService\Exception\PromisedKeysNotInContextException;
+use LightService\Exception\NextActionException;
+use LightService\Exception\RollbackException;
+use LightService\Exception\NotImplementedException;
 
 trait Action {
     private $context;

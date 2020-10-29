@@ -1,4 +1,6 @@
 {
+  "name": "douglasgreyling/light-service",
+  "description": "A service object framework for PHP",
   "require-dev": {
     "phpunit/phpunit": "^9.4"
   },
@@ -6,10 +8,10 @@
   "prefer-stable": true,
   "autoload": {
     "psr-4": {
-      "LightServicePHP\\": "src/",
-      "LightServicePHP\\Exception\\": "src/exceptions",
-      "LightServicePHP\\Fixtures\\Actions\\": "tests/fixtures/actions",
-      "LightServicePHP\\Fixtures\\Organizers\\": "tests/fixtures/organizers"
+      "LightService\\": "src/",
+      "LightService\\Exception\\": "src/exceptions",
+      "LightService\\Fixtures\\Actions\\": "tests/fixtures/actions",
+      "LightService\\Fixtures\\Organizers\\": "tests/fixtures/organizers"
     }
   },
   "require": {

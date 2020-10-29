@@ -135,4 +135,10 @@ final class ActionTest extends TestCase {
 
         $this->assertEquals(['number' => 0], $result->to_array());
     }
+
+    public function test_it_does_nothing_when_no_rollback_function_is_defined() {
+        $result = SuccessfulAction::rollback(['a' => 1]);
+
+        $this->assertEquals(['a' => 1], $result->to_array());
+    }
 }

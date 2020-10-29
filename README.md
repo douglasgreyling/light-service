@@ -1,7 +1,9 @@
 # LightService:
 
+![Packagist Version](https://img.shields.io/packagist/v/douglasgreyling/light-service)
 [![build Actions Status](https://github.com/douglasgreyling/light-service/workflows/build/badge.svg)](https://github.com/douglasgreyling/light-service/actions)
 [![codecov](https://codecov.io/gh/douglasgreyling/light-service/branch/main/graph/badge.svg?token=6KV6XMO36Z)](undefined)
+![Packagist License](https://img.shields.io/packagist/l/douglasgreyling/light-service)
 
 A service object framework heavily, heavily, heavily inspired by the [LightService](https://github.com/adomokos/light-service) Ruby gem.
 
@@ -836,7 +838,7 @@ TODO - This will come one day.
 1. Fork it
 2. Try keep your commits semantic [like this](https://seesparkbox.com/foundry/semantic_commit_messages).
 3. Create your feature branch (git checkout -b my-new-feature)
-4. Commit your changes (git commit -am 'Added some feature')
+4. Commit your changes (git commit -am 'fix: Added some feature')
 5. Push to the branch (git push origin my-new-feature)
 6. Create new Pull Request
 

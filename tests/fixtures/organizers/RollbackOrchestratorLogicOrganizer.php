@@ -18,7 +18,7 @@ class RollbackOrchestratorLogicOrganizer {
                 AddsOneAction::class,
                 RollbackAction::class
             ]),
-            AddsOneAction::class,
+            AddsOneAction::class
         );
     }
 }

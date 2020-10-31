@@ -15,7 +15,7 @@ class RollbackOrganizer {
             AddsOneAction::class,
             AddsOneAction::class,
             RollbackAction::class,
-            AddsOneAction::class,
+            AddsOneAction::class
         );
     }
 }

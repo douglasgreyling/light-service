@@ -4,8 +4,7 @@ namespace LightService;
 
 use LightService\Orchestrator;
 
-use Doctrine\Inflector\InflectorFactory;
-use Doctrine\Inflector\Language;
+use \Doctrine\Common\Inflector\Inflector;
 
 trait OrchestratorLogic {
     public static function reduce_if($predicate_fn, $actions) {
@@ -35,12 +34,10 @@ trait OrchestratorLogic {
     }
 
     public static function iterate($key, $actions) {
-        $inflector = InflectorFactory::createForLanguage(Language::ENGLISH)->build();
-
-        return function($organizer) use($key, $actions, $inflector) {
+        return function($organizer) use($key, $actions) {
             $context          = $organizer->context;
             $iterable         = is_null($context->$key) ? [] : $context->$key;
-            $singularized_key = $inflector->singularize($key);
+            $singularized_key = Inflector::singularize($key);
 
             foreach($iterable as $i) {
                 foreach($actions as $action) {

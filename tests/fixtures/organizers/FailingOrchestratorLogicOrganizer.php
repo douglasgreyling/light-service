@@ -18,7 +18,7 @@ class FailingOrchestratorLogicOrganizer {
                 AddsOneAction::class,
                 FailingAction::class
             ]),
-            AddsOneAction::class,
+            AddsOneAction::class
         );
     }
 }

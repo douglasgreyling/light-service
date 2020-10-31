@@ -70,7 +70,7 @@ final class OrchestratorTest extends TestCase {
             AddsOneAction::class,
             AddsOneAction::class,
             RollbackAction::class,
-            AddsOneAction::class,
+            AddsOneAction::class
         ]);
 
         $this->assertEquals(['number' => 0], $result->to_array());

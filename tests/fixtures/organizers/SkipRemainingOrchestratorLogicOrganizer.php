@@ -18,7 +18,7 @@ class SkipRemainingOrchestratorLogicOrganizer {
                 AddsOneAction::class,
                 SkipRemainingAction::class
             ]),
-            AddsOneAction::class,
+            AddsOneAction::class
         );
     }
 }

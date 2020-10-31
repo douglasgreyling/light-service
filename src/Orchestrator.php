@@ -33,7 +33,7 @@ class Orchestrator {
                 if ($expects_key_aliases)
                     $this->organizer->context->use_aliases($this->organizer->key_aliases());
 
-                $this->context = $this->wrap_hooks($action)();
+                $this->context = call_user_func($this->wrap_hooks($action));
 
                 $this
                     ->context

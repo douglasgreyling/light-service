@@ -54,6 +54,8 @@ trait Action {
         if (isset($this->expects))
             $expected_keys = is_array($this->expects) ? $this->expects : [$this->expects];
 
+        $expected_keys = array_unique($expected_keys);
+
         return $expected_keys;
     }
 
@@ -69,7 +71,6 @@ trait Action {
         $expected_keys = $this->expected_keys();
 
         $expected_keys_length = count($expected_keys);
-
         $matched_keys         = array_keys($this->context->fetch($expected_keys));
 
         if ($expected_keys_length != count($matched_keys))
@@ -91,6 +92,8 @@ trait Action {
 
         if (isset($this->promises))
             $promised_keys = is_array($this->promises) ? $this->promises : [$this->promises];
+
+        $promised_keys = array_unique($promised_keys);
 
         return $promised_keys;
     }

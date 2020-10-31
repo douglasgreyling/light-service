@@ -19,6 +19,8 @@ use LightService\Fixtures\Actions\NoMissingPromisesAction;
 use LightService\Fixtures\Actions\RollbackAction;
 use LightService\Fixtures\Actions\SingleExpectsAndPromisesAction;
 use LightService\Fixtures\Actions\SuccessfulAction;
+use LightService\Fixtures\Actions\DuplicateExpectsAction;
+use LightService\Fixtures\Actions\DuplicatePromisesAction;
 
 final class ActionTest extends TestCase {
     public function test_it_can_be_instantiated_with_an_associated_array_as_context() {
@@ -140,5 +142,17 @@ final class ActionTest extends TestCase {
         $result = SuccessfulAction::rollback(['a' => 1]);
 
         $this->assertEquals(['a' => 1], $result->to_array());
+    }
+
+    public function test_it_ignores_duplicate_expects_keys() {
+        $result = DuplicateExpectsAction::execute(['number' => 0]);
+
+        $this->assertEquals(['number' => 1], $result->to_array());
+    }
+
+    public function test_it_ignores_duplicate_promises_keys() {
+        $result = DuplicatePromisesAction::execute(['number' => 0]);
+
+        $this->assertEquals(['number' => 1], $result->to_array());
     }
 }

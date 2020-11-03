@@ -378,7 +378,7 @@ Let's imagine that in the example above the organizer called 4 actions. The firs
 
 ### Hooks
 
-In case you need to inject code right before, after or even around actions, then hooks could be the droid you're looking for. This addition to LightService is a great way to decouple instrumentation from business logic.
+In case you need to inject code right before, after or even around actions (or even around), then hooks could be the droid you're looking for. This addition to LightService is a great way to decouple instrumentation from business logic.
 
 Consider this code:
 
@@ -413,10 +413,7 @@ class TwoAction {
 
 The logging logic makes `TwoAction` more complex, there is more code for logging than for business logic.
 
-You have two options to decouple instrumentation from real logic with `before_each` and `after_each` hooks:
-
-1. Declare your hooks in the Organizer
-2. Attach hooks to the Organizer from the outside
+You have three options to include hooks so you can decouple instrumentation from real logic with `before_each`, `after_each` and `around_each` hooks:
 
 This is how you can declaratively add before and after hooks to the organizer:
 
@@ -440,6 +437,10 @@ class SomeOrganizer {
 
       $context->logger->info('admin is doing something');
     }
+  }
+
+  public function around_each($context) {
+    $context->logger->info('admin is about to do (or already has done) something');
   }
 
   public static function call($context) {
@@ -500,11 +501,19 @@ class FooAction {
 }
 ```
 
-### Context metadata
+### Context
 
-The context will track some handy metadata.
+The context allows you to convert itself to an array:
 
-They include:
+```php
+$result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
+
+var_dump($result->to_array());
+```
+
+This will convert all of the key-values inside the context to an array. Optionally you can also pass true as the first arguement to the `to_array` function to have the context metadata included.
+
+The context also allows you to query metadata kept inside the context:
 
 1. The current action (`$context->current_action();`)
 2. The current organizer (`$context->current_organizer();`)

@@ -3,3 +3,4 @@ composer.phar
 vendor/
 .phpunit.result.cache
 .vscode
+.DS_Store

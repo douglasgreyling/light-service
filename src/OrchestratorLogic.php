@@ -8,13 +8,16 @@ use Doctrine\Inflector\InflectorFactory;
 use Doctrine\Inflector\Language;
 
 trait OrchestratorLogic {
-    public static function reduce_if($predicate_fn, $actions) {
-        return function($organizer) use($predicate_fn, $actions) {
+    public static function reduce_if($predicate_fn, $true_actions, $false_actions = []) {
+        return function($organizer) use($predicate_fn, $true_actions, $false_actions) {
             $context = $organizer->context;
 
             if ($predicate_fn($context)) {
                 $org     = new Orchestrator($organizer);
-                $context = $org->run($actions);
+                $context = $org->run($true_actions);
+            } else {
+                $org     = new Orchestrator($organizer);
+                $context = $org->run($false_actions);
             }
 
             return $context;

@@ -4,25 +4,28 @@ use PHPUnit\Framework\TestCase;
 
 use LightService\Exception\NotImplementedException;
 
-use LightService\Fixtures\Organizers\AddToContextOrganizer;
-use LightService\Fixtures\Organizers\AllHooksOrganizer;
-use LightService\Fixtures\Organizers\AroundEachOrganizer;
-use LightService\Fixtures\Organizers\BeforeAfterEachOrganizer;
-use LightService\Fixtures\Organizers\DoesNothingOrganizer;
-use LightService\Fixtures\Organizers\ExecuteOrganizer;
-use LightService\Fixtures\Organizers\FailingOrchestratorLogicOrganizer;
-use LightService\Fixtures\Organizers\FailingOrganizer;
-use LightService\Fixtures\Organizers\IterateOrganizer;
-use LightService\Fixtures\Organizers\KeyAliasesOrganizer;
-use LightService\Fixtures\Organizers\NoCallFunctionOrganizer;
-use LightService\Fixtures\Organizers\OneSkipOrganizer;
-use LightService\Fixtures\Organizers\ReduceIfOrganizer;
-use LightService\Fixtures\Organizers\ReduceUntilOrganizer;
-use LightService\Fixtures\Organizers\RollbackOrchestratorLogicOrganizer;
-use LightService\Fixtures\Organizers\RollbackOrganizer;
-use LightService\Fixtures\Organizers\SkipRemainingOrchestratorLogicOrganizer;
-use LightService\Fixtures\Organizers\SkipRemainingOrganizer;
-use LightService\Fixtures\Organizers\SuccessfulOrganizer;
+use LightService\Fixtures\Organizers\{
+    AddToContextOrganizer,
+    AllHooksOrganizer,
+    AroundEachOrganizer,
+    BeforeAfterEachOrganizer,
+    DoesNothingOrganizer,
+    ExecuteOrganizer,
+    FailingOrchestratorLogicOrganizer,
+    FailingOrganizer,
+    IterateOrganizer,
+    KeyAliasesOrganizer,
+    NoCallFunctionOrganizer,
+    OneSkipOrganizer,
+    ReduceIfOrganizer,
+    ReduceIfOrganizerWithFalseActions,
+    ReduceUntilOrganizer,
+    RollbackOrchestratorLogicOrganizer,
+    RollbackOrganizer,
+    SkipRemainingOrchestratorLogicOrganizer,
+    SkipRemainingOrganizer,
+    SuccessfulOrganizer
+};
 
 final class OrganizerTest extends TestCase {
     public function test_it_throws_an_error_when_the_call_function_is_not_implemented() {
@@ -145,6 +148,18 @@ final class OrganizerTest extends TestCase {
         $result = ReduceIfOrganizer::call(-3);
 
         $this->assertEquals(['number' => -1], $result->to_array());
+    }
+
+    public function test_it_will_reduce_the_first_set_of_provided_actions_if_the_predicate_is_true() {
+        $result = ReduceIfOrganizerWithFalseActions::call(2);
+
+        $this->assertEquals(['number' => 5], $result->to_array());
+    }
+
+    public function test_it_will_reduce_the_first_set_of_provided_actions_if_the_predicate_is_false() {
+        $result = ReduceIfOrganizerWithFalseActions::call(0);
+
+        $this->assertEquals(['number' => 4], $result->to_array());
     }
 
     public function test_it_will_reduce_actions_until_the_predicate_returns_true_in_the_reduce_until_orchestrator_logic_function() {

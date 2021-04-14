@@ -14,6 +14,7 @@ use LightService\Fixtures\Organizers\{
     FailingOrchestratorLogicOrganizer,
     FailingOrganizer,
     IterateOrganizer,
+    IterateOrganizerWithOrchestrators,
     KeyAliasesOrganizer,
     NoCallFunctionOrganizer,
     OneSkipOrganizer,
@@ -190,6 +191,12 @@ final class OrganizerTest extends TestCase {
         $result = IterateOrganizer::call(['numbers' => [1, 2, 3], 'sum' => 0]);
 
         $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 6], $result->to_array());
+    }
+
+    public function test_it_will_iterate_using_orchestrators() {
+        $result = IterateOrganizerWithOrchestrators::call(['numbers' => [1, 2, 3], 'sum' => 0]);
+
+        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 9], $result->to_array());
     }
 
     public function test_it_will_rollback_all_the_actions_when_orchestrator_logic_functions_are_used() {

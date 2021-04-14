@@ -48,7 +48,7 @@ trait OrchestratorLogic {
             foreach($iterable as $i) {
                 foreach($actions as $action) {
                     $action_context = $context->merge([$singularized_key => $i]);
-                    $context        = $action::execute($action_context);
+                    $context        = is_callable($action) ? $action($organizer) : $action::execute($action_context);
                 }
             }
 

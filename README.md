@@ -761,6 +761,8 @@ class ReduceIfOrganizer {
 
 In this case the organizer above takes a number, executes a couple of actions before reducing an array of actions (in this case only containing the `AddsOneAction`) if the number in the context is greater than 1.
 
+A 3rd argument can be given to `reduce_if` which will be an array of actions to run if the predicate returns false.
+
 #### 3. `iterate`
 
 `iterate` gives you iteration logic based on a string which exists as a key inside the context otherwise it will fail.

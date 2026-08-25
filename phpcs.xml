@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="light-service">
+    <description>PSR-12 across the library and its tests.</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12"/>
+
+    <!-- PSR-12 says nothing about array indentation; without this, multi-line
+         arrays keep whatever depth they were written at. -->
+    <rule ref="Generic.Arrays.ArrayIndent"/>
+</ruleset>

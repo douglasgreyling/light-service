@@ -2,17 +2,20 @@
 
 namespace LightService\Fixtures\Actions;
 
-class RollbackAction {
+class RollbackAction
+{
     use \LightService\Action;
 
     private $expects  = ['number'];
     private $promises = ['number'];
 
-    private function executed($context) {
-        $context->fail_with_rollback('I want to roll back!');
+    protected function executed($context)
+    {
+        $context->failWithRollback('I want to roll back!');
     }
 
-    private function rolled_back($context) {
+    protected function rolledBack($context)
+    {
         $context->number -= 1;
     }
 }

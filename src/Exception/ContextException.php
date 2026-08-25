@@ -4,6 +4,7 @@ namespace LightService\Exception;
 
 use Exception;
 
-class ContextException extends Exception {
+class ContextException extends Exception
+{
     //
 }

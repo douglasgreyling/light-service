@@ -4,18 +4,22 @@ namespace LightService\Fixtures\Organizers;
 
 use LightService\Fixtures\Actions\SetsAAction;
 
-class BeforeAfterHooksOrganizer {
+class BeforeAfterHooksOrganizer
+{
     use \LightService\Organizer;
 
-    public function before_each($context) {
+    public function beforeEach($context)
+    {
         $context->a[] = 'before';
     }
 
-    public function after_each($context) {
+    public function afterEach($context)
+    {
         $context->a[] = 'after';
     }
 
-    public static function call() {
+    public static function call()
+    {
         return self::with(['a' => []])->reduce(
             SetsAAction::class
         );

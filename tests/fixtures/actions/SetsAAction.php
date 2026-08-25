@@ -2,10 +2,12 @@
 
 namespace LightService\Fixtures\Actions;
 
-class SetsAAction {
+class SetsAAction
+{
     use \LightService\Action;
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $context->a[] = 'action';
     }
 }

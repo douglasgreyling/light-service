@@ -1,13 +1,12 @@
 <?php
 
+namespace LightService\Tests\Unit;
+
 use PHPUnit\Framework\TestCase;
-
 use LightService\Context;
-
 use LightService\Exception\ExpectedKeysNotInContextException;
 use LightService\Exception\PromisedKeysNotInContextException;
 use LightService\Exception\NotImplementedException;
-
 use LightService\Fixtures\Actions\FailAndReturnAction;
 use LightService\Fixtures\Actions\FailingAction;
 use LightService\Fixtures\Actions\MissingAllPromisesAction;
@@ -19,79 +18,95 @@ use LightService\Fixtures\Actions\NoMissingPromisesAction;
 use LightService\Fixtures\Actions\RollbackAction;
 use LightService\Fixtures\Actions\SingleExpectsAndPromisesAction;
 use LightService\Fixtures\Actions\SuccessfulAction;
+use LightService\Fixtures\Actions\ReadsAPromisedKeyAction;
+use LightService\Fixtures\Actions\BaseNameAction;
+use LightService\Fixtures\Actions\SpecialisedNameAction;
 use LightService\Fixtures\Actions\DuplicateExpectsAction;
 use LightService\Fixtures\Actions\DuplicatePromisesAction;
 
-final class ActionTest extends TestCase {
-    public function test_it_can_be_instantiated_with_an_associated_array_as_context() {
+final class ActionTest extends TestCase
+{
+    public function testItCanBeInstantiatedWithAnAssociatedArrayAsContext()
+    {
         $action = new SuccessfulAction(['a' => 1, 'b' => 2]);
 
-        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->to_array());
+        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->toArray());
     }
 
-    public function test_it_can_be_instantiated_with_a_given_context_as_action_context() {
+    public function testItCanBeInstantiatedWithAGivenContextAsActionContext()
+    {
         $action_context = new Context(['a' => 1, 'b' => 2]);
         $action         = new SuccessfulAction($action_context);
 
-        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->to_array());
+        $this->assertEquals(['a' => 1, 'b' => 2], $action->context()->toArray());
     }
 
-    public function test_it_instantiates_the_action_context_with_the_class_of_the_action() {
+    public function testItInstantiatesTheActionContextWithTheClassOfTheAction()
+    {
         $action_context = new Context();
         $action         = new SuccessfulAction($action_context);
 
-        $this->assertEquals(SuccessfulAction::class, $action->context()->current_action());
+        $this->assertEquals(SuccessfulAction::class, $action->context()->currentAction());
     }
 
-    public function test_it_returns_no_context_validation_errors_with_empty_expected_keys() {
+    public function testItReturnsNoContextValidationErrorsWithEmptyExpectedKeys()
+    {
         $result = NoMissingExpectsAction::execute(['a' => 1, 'b' => 2]);
 
         $this->assertTrue($result->success());
     }
 
-    public function test_it_can_accept_a_single_string_for_the_expected_key_in_the_context() {
+    public function testItCanAcceptASingleStringForTheExpectedKeyInTheContext()
+    {
         $result = SingleExpectsAndPromisesAction::execute(['a' => 1]);
 
         $this->assertEquals(2, $result->b);
     }
 
-    public function test_it_throws_an_exception_when_all_of_the_expected_keys_are_not_in_the_context() {
+    public function testItThrowsAnExceptionWhenAllOfTheExpectedKeysAreNotInTheContext()
+    {
         $this->expectException(ExpectedKeysNotInContextException::class);
 
         SuccessfulAction::execute([]);
     }
 
-    public function test_it_throws_an_exception_some_of_the_expected_keys_are_not_in_the_context() {
+    public function testItThrowsAnExceptionSomeOfTheExpectedKeysAreNotInTheContext()
+    {
         $this->expectException(ExpectedKeysNotInContextException::class);
 
         SuccessfulAction::execute(['a' => 1]);
     }
 
-    public function test_it_returns_no_context_validation_exceptions_with_empty_promised_keys() {
+    public function testItReturnsNoContextValidationExceptionsWithEmptyPromisedKeys()
+    {
         $result = NoMissingPromisesAction::execute(['a' => 1, 'b' => 2]);
 
         $this->assertTrue($result->success());
     }
 
-    public function test_it_throws_an_exception_when_all_of_the_the_promised_keys_are_not_in_the_context() {
+    public function testItThrowsAnExceptionWhenAllOfTheThePromisedKeysAreNotInTheContext()
+    {
         $this->expectException(PromisedKeysNotInContextException::class);
 
         MissingAllPromisesAction::execute(['a' => 1, 'b' => 2]);
     }
 
-    public function test_it_throws_an_exception_some_of_the_the_promised_keys_are_not_in_the_context() {
+    public function testItThrowsAnExceptionSomeOfTheThePromisedKeysAreNotInTheContext()
+    {
         $this->expectException(PromisedKeysNotInContextException::class);
 
         MissingSomePromisesAction::execute(['a' => 1, 'b' => 2]);
     }
 
-    public function test_it_throws_an_exception_when_the_executed_function_is_not_implemented() {
+    public function testItThrowsAnExceptionWhenTheExecutedFunctionIsNotImplemented()
+    {
         $this->expectException(NotImplementedException::class);
 
         NoExecutedFunctionAction::execute(['a' => 1, 'b' => 2]);
     }
 
-    public function test_it_can_skip_to_the_next_action_using_the_next_context_function() {
+    public function testItCanSkipToTheNextActionUsingTheNextContextFunction()
+    {
         $result = NextActionAction::execute(['a' => 1, 'b' => 2]);
 
         $this->assertFalse($result->failure());
@@ -99,60 +114,97 @@ final class ActionTest extends TestCase {
         $this->assertArrayNotHasKey('d', $result->keys());
     }
 
-    public function test_it_can_mark_the_current_context_as_failed_with_a_message_using_the_fail_function() {
+    public function testItCanMarkTheCurrentContextAsFailedWithAMessageUsingTheFailFunction()
+    {
         $result = FailingAction::execute(['a' => 1, 'b' => 2]);
 
         $this->assertTrue($result->failure());
         $this->assertFalse($result->success());
     }
 
-    public function test_it_can_mark_the_current_context_as_failed_and_move_onto_the_next_context_using_the_fail_and_return_function() {
+    public function testItCanMarkTheCurrentContextAsFailedAndMoveOntoTheNextContextUsingTheFailAndReturnFunction()
+    {
         $result = FailAndReturnAction::execute();
 
         $this->assertTrue($result->failure());
         $this->assertArrayNotHasKey('one', $result->keys());
     }
 
-    public function test_it_can_get_the_current_context() {
+    public function testItCanGetTheCurrentContext()
+    {
         $action = new SuccessfulAction(['a' => 1]);
 
-        $this->assertEquals(['a' => 1], $action->context()->to_array());
+        $this->assertEquals(['a' => 1], $action->context()->toArray());
     }
 
-    public function test_it_can_get_the_expected_keys() {
+    public function testItCanGetTheExpectedKeys()
+    {
         $action = new SuccessfulAction(['a' => 1]);
 
-        $this->assertEquals(['a', 'b'], $action->expected_keys());
+        $this->assertEquals(['a', 'b'], $action->expectedKeys());
     }
 
-    public function test_it_can_fail_the_context_and_rollback() {
+    public function testItCanGetThePromisedKeys()
+    {
+        $action = new SuccessfulAction(['a' => 1]);
+
+        $this->assertEquals(['c'], $action->promisedKeys());
+    }
+
+    public function testItCanFailTheContextAndRollback()
+    {
         $result = RollbackAction::execute(['number' => 1]);
 
-        $this->assertEquals(['number' => 0], $result->to_array());
+        $this->assertEquals(['number' => 0], $result->toArray());
         $this->assertEquals('I want to roll back!', $result->message());
     }
 
-    public function test_it_can_fail_the_context_and_rollback_statically_with_a_given_context() {
+    public function testItCanFailTheContextAndRollbackStaticallyWithAGivenContext()
+    {
         $result = RollbackAction::rollback(['number' => 1]);
 
-        $this->assertEquals(['number' => 0], $result->to_array());
+        $this->assertEquals(['number' => 0], $result->toArray());
     }
 
-    public function test_it_does_nothing_when_no_rollback_function_is_defined() {
+    public function testItDoesNothingWhenNoRollbackFunctionIsDefined()
+    {
         $result = SuccessfulAction::rollback(['a' => 1]);
 
-        $this->assertEquals(['a' => 1], $result->to_array());
+        $this->assertEquals(['a' => 1], $result->toArray());
     }
 
-    public function test_it_ignores_duplicate_expects_keys() {
+    public function testItIgnoresDuplicateExpectsKeys()
+    {
         $result = DuplicateExpectsAction::execute(['number' => 0]);
 
-        $this->assertEquals(['number' => 1], $result->to_array());
+        $this->assertEquals(['number' => 1], $result->toArray());
     }
 
-    public function test_it_ignores_duplicate_promises_keys() {
+    public function testItIgnoresDuplicatePromisesKeys()
+    {
         $result = DuplicatePromisesAction::execute(['number' => 0]);
 
-        $this->assertEquals(['number' => 1], $result->to_array());
+        $this->assertEquals(['number' => 1], $result->toArray());
+    }
+
+    public function testItDoesNotLetReadingAPromisedKeySatisfyThePromise()
+    {
+        $this->expectException(PromisedKeysNotInContextException::class);
+
+        ReadsAPromisedKeyAction::execute(['a' => 1]);
+    }
+
+    public function testItRunsTheSubclassWhenAnActionIsExtended()
+    {
+        $this->assertEquals('SpecialisedNameAction', SpecialisedNameAction::execute()->who);
+        $this->assertEquals('BaseNameAction', BaseNameAction::execute()->who);
+    }
+
+    public function testItRecordsTheSubclassAsTheCurrentAction()
+    {
+        $this->assertEquals(
+            SpecialisedNameAction::class,
+            SpecialisedNameAction::execute()->currentAction()
+        );
     }
 }

@@ -37,6 +37,7 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
   - [Action rollback](#action-rollback)
   - [Orchestrator logic](#orchestrator-logic)
   - [Context factory for faster action testing](#context-factory-for-faster-action-testing)
+- [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -45,29 +46,31 @@ Be sure to check out the original [LightService](https://github.com/adomokos/lig
 What do you think of this code?
 
 ```php
-class TaxController extends SomeController {
-  public function update {
-    $order = Order::find(request('id'));
-    $tax_ranges = TaxRange::for_region($order->region);
+class TaxController extends SomeController
+{
+    public function update()
+    {
+        $order = Order::find(request('id'));
+        $tax_ranges = TaxRange::forRegion($order->region);
 
-    if (is_null($tax_ranges)) {
-      return ...; // render some view
+        if (is_null($tax_ranges)) {
+            return ...; // render some view
+        }
+
+        $tax_percentage = $tax_ranges->forTotal($order->total);
+
+        if (is_null($tax_percentage)) {
+            return ...; // render some other view
+        }
+
+        $order->tax = round(($order->total * ($tax_percentage / 100)), 2);
+
+        if ($order->total_with_tax > 200) {
+            $order->provide_free_shipping;
+        }
+
+        return ...; // Redirect to some view with a flash message
     }
-
-    $tax_percentage = $tax_ranges->for_total($order->total);
-
-    if (is_null($tax_percentage)) {
-      return ...; // render some other view
-    }
-
-    $order->tax = round(($order->total * ($tax_percentage/100)), 2);
-
-    if ($order->total_with_tax > 200) {
-      $order->provide_free_shipping;
-    }
-
-    return ...; // Redirect to some view with a flash message
-  }
 }
 ```
 
@@ -108,7 +111,7 @@ Here's a diagram to understand the relationship between organizers and actions:
 
 ### Requirements:
 
-PHP 7.3+ is required 😅
+PHP 8.2+ is required 😅
 
 ### Installation:
 
@@ -121,15 +124,17 @@ composer require douglasgreyling/light-service
 Let's make a simple greeting action.
 
 ```php
-class GreetsSomeoneAction {
-  use LightService\Action;
+class GreetsSomeoneAction
+{
+    use LightService\Action;
 
-  private $expects  = ['name'];
-  private $promises = ['greeting'];
+    private $expects  = ['name'];
+    private $promises = ['greeting'];
 
-  private function executed($context) {
-    $context->greeting = "Hello, {$context->name}. Solved any fun mysteries lately?";
-  }
+    protected function executed($context)
+    {
+        $context->greeting = "Hello, {$context->name}. Solved any fun mysteries lately?";
+    }
 }
 
 $result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
@@ -145,7 +150,7 @@ Once an action is run we can access the finished context, and the status of the 
 $result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
 
 if ($result->success()) {
-  echo $result->greeting;
+    echo $result->greeting;
 }
 
 > "Hello, Scooby. Solved any fun mysteries lately?"
@@ -160,31 +165,35 @@ Most times a simple action isn't enough. LightService lets you compose a bunch o
 Before we create out organizer, let's create one more action:
 
 ```php
-class FeedsSomeoneAction {
-  use LightService\Action;
+class FeedsSomeoneAction
+{
+    use LightService\Action;
 
-  private $expects = ['name'];
+    private $expects = ['name'];
 
-  private function executed($context) {
-    $snack = Fridge::fetch('Grapes');
+    protected function executed($context)
+    {
+        $snack = Fridge::fetch('Grapes');
 
-    Person::find($context->name)->feed($snack);
-  }
+        Person::find($context->name)->feed($snack);
+    }
 }
 ```
 
 Now let's create our organizer like this:
 
 ```php
-class GreetsAndFeedsSomeone {
-  use LightService\Organizer;
+class GreetsAndFeedsSomeone
+{
+    use LightService\Organizer;
 
-  public static function call($name) {
-    return self::with(['name' => $name])->reduce(
-      GreetsSomeoneAction::class,
-      FeedSomeoneAction::class
-    );
-  }
+    public static function call($name)
+    {
+        return self::with(['name' => $name])->reduce(
+            GreetsSomeoneAction::class,
+            FeedSomeoneAction::class
+        );
+    }
 }
 
 $result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
@@ -200,7 +209,7 @@ Just like actions, organizers return the final context as their return value.
 $result = GreetsAndFeedsSomeone::call(['name' => 'Shaggy']);
 
 if ($result->success()) {
-  echo "Time to stock up on snacks!";
+    echo "Time to stock up on snacks!";
 }
 
 > "Time to stock up on snacks!"
@@ -221,100 +230,110 @@ We'll begin by looking at the controller. We want to look for distinct steps whi
 #### The organizer:
 
 ```php
-class CalculatesTax {
-  use LightService\Organizer;
+class CalculatesTax
+{
+    use LightService\Organizer;
 
-  public static function call($order) {
-    return self::with(['order' => $order])->reduce(
-      LooksUpTaxPercentageAction::class,
-      CalculatesOrderTaxAction::class,
-      ProvidesFreeShippingAction::class
-    );
-  }
+    public static function call($order)
+    {
+        return self::with(['order' => $order])->reduce(
+            LooksUpTaxPercentageAction::class,
+            CalculatesOrderTaxAction::class,
+            ProvidesFreeShippingAction::class
+        );
+    }
 }
 ```
 
 #### Looking up the tax percentage:
 
 ```php
-class LooksUpTaxPercentageAction {
-  use LightService\Action;
+class LooksUpTaxPercentageAction
+{
+    use LightService\Action;
 
-  private $expects  = ['order'];
-  private $promises = ['tax_percentage'];
+    private $expects  = ['order'];
+    private $promises = ['tax_percentage'];
 
-  private function executed($context) {
-    $order      = $context->order;
-    $tax_ranges = TaxRange::for_region($order->region);
+    protected function executed($context)
+    {
+        $order      = $context->order;
+        $tax_ranges = TaxRange::forRegion($order->region);
 
-    $context->tax_percentage = 0;
+        $context->tax_percentage = 0;
 
-    if (is_null($tax_ranges)) {
-      $context->fail('The tax ranges were not found');
-      $this->next_context();
+        if (is_null($tax_ranges)) {
+            $context->fail('The tax ranges were not found');
+            $this->nextContext();
+        }
+
+        $tax_percentage = $tax_ranges->forTotal($order->total);
+
+        if (is_null($tax_percentage)) {
+            $context->fail('The tax percentage were not found');
+            $this->nextContext();
+        }
+
+        $context->tax_percentage = $tax_percentage;
     }
-
-    $tax_percentage = $tax_ranges->for_total($order->total);
-
-    if (is_null($tax_percentage)) {
-      $context->fail('The tax percentage were not found');
-      $this->next_context();
-    }
-
-    $context->tax_percentage = $tax_percentage
-  }
 }
 ```
 
 #### Calculating the order tax:
 
 ```php
-class CalculatesOrderTaxAction {
-  use LightService\Action;
+class CalculatesOrderTaxAction
+{
+    use LightService\Action;
 
-  private $expects = ['order', 'tax_percentage'];
+    private $expects = ['order', 'tax_percentage'];
 
-  private function executed($context) {
-    $context
-      ->order
-      ->tax = round($order->total * ($tax_percentage/100), 2);
-  }
+    protected function executed($context)
+    {
+        $context
+        ->order
+        ->tax = round($order->total * ($tax_percentage / 100), 2);
+    }
 }
 ```
 
 #### Providing free shipping (where applicable):
 
 ```php
-class ProvidesFreeShippingAction {
-  use LightService\Action;
+class ProvidesFreeShippingAction
+{
+    use LightService\Action;
 
-  private $expects = ['order'];
+    private $expects = ['order'];
 
-  private function executed($context) {
-    $total_with_tax = $context->order->total_with_tax;
+    protected function executed($context)
+    {
+        $total_with_tax = $context->order->total_with_tax;
 
-    if ($total_with_tax > 200)) {
-      $context->order->provide_free_shipping;
+        if ($total_with_tax > 200) {
+            $context->order->provide_free_shipping;
+        }
     }
-  }
 }
 ```
 
 #### And finally, the controller:
 
 ```php
-class TaxController extends Controller {
-  public function update {
-    $order = Order::find(request('id'));
+class TaxController extends Controller
+{
+    public function update()
+    {
+        $order = Order::find(request('id'));
 
-    $service_result = CalculatesTax::call($order);
+        $service_result = CalculatesTax::call($order);
 
-    if ($service_result->failure()) {
-      return ...; // render some view
-    } else {
-      return ...; // Redirect to some view with a flash message
+        if ($service_result->failure()) {
+            return ...; // render some view
+        } else {
+            return ...; // Redirect to some view with a flash message
+        }
     }
-  }
 }
 ```
 
@@ -333,22 +352,24 @@ However, sometimes not everything will play out as you expect it. An external AP
 
 When something goes wrong in an action and you want to halt the chain, you need to call `fail()` on the context object. This will push the context in a failure state (`$context->failure()` will evalute to true). The context's `fail` function can take an optional message argument, this message might help describe what went wrong. In case you need to return immediately from the point of failure, you have to do that by calling next context.
 
-In case you want to fail the context and stop the execution of the executed block, use the `fail_and_return('something went wrong')` function. This will immediately fail the context and cause the execute function to return.
+In case you want to fail the context and stop the execution of the executed block, use the `failAndReturn('something went wrong')` function. This will immediately fail the context and cause the execute function to return.
 
 Here's an example:
 
 ```php
-class SubmitsOrderAction {
-  use LightService\Action;
+class SubmitsOrderAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    if (!$context->order->submit_order_successful()) {
-      $context->fail_and_return('Failed to submit the order');
+    protected function executed($context)
+    {
+        if (!$context->order->submitOrderSuccessful()) {
+            $context->failAndReturn('Failed to submit the order');
+        }
+
+      // This won't be executed
+        $context->mailer->sendOrderNotification();
     }
-
-    // This won't be executed
-    $context->mailer->send_order_notification();
-  }
 }
 ```
 
@@ -358,17 +379,19 @@ Let's imagine that in the example above the organizer could have called 4 action
 
 #### Skipping the rest of the actions
 
-You can skip the rest of the actions by calling `skip_remaining()` on the context. This behaves very similarly to the above-mentioned fail mechanism, except this will not push the context into a failure state. A good use case for this is executing the first couple of actions and based on a check you might not need to execute the rest. Here is an example of how you do it:
+You can skip the rest of the actions by calling `skipRemaining()` on the context. This behaves very similarly to the above-mentioned fail mechanism, except this will not push the context into a failure state. A good use case for this is executing the first couple of actions and based on a check you might not need to execute the rest. Here is an example of how you do it:
 
 ```php
-class ChecksOrderStatusAction {
-  use LightService\Action;
+class ChecksOrderStatusAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    if ($context->order->must_send_notification()) {
-      $context->skip_remaining("Everything is good, no need to execute the rest of the actions");
+    protected function executed($context)
+    {
+        if ($context->order->mustSendNotification()) {
+            $context->skipRemaining("Everything is good, no need to execute the rest of the actions");
+        }
     }
-  }
 }
 ```
 
@@ -383,89 +406,105 @@ In case you need to inject code right before, after or even around actions (or e
 Consider this code:
 
 ```php
-class SomeOrganizer {
-  use LightService\Organizer;
+class SomeOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call($context) {
-    return self::with($context)->reduce(...self::actions());
-  }
+    public static function call($context)
+    {
+        return self::with($context)->reduce(...self::actions());
+    }
 
-  public static function actions() {
-    return [
-      OneAction::class,
-      TwoAction::class,
-      ThreeAction::class
-    ];
-  }
+    public static function actions()
+    {
+        return [
+            OneAction::class,
+            TwoAction::class,
+            ThreeAction::class
+        ];
+    }
 }
 
-class TwoAction {
-  use LightService\Action;
+class TwoAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    if ($context->user->role == 'admin')
-      $context->logger->info('admin is doing something');
+    protected function executed($context)
+    {
+        if ($context->user->role == 'admin') {
+            $context->logger->info('admin is doing something');
+        }
 
-    $context->user->do_something();
-  }
+        $context->user->doSomething();
+    }
 }
 ```
 
 The logging logic makes `TwoAction` more complex, there is more code for logging than for business logic.
 
-You have three options to include hooks so you can decouple instrumentation from real logic with `before_each`, `after_each` and `around_each` hooks:
+You have three options to include hooks so you can decouple instrumentation from real logic with `beforeEach`, `afterEach` and `aroundEach` hooks:
 
 This is how you can declaratively add before and after hooks to the organizer:
 
 ```php
-class SomeOrganizer {
-  use LightService\Organizer;
+class SomeOrganizer
+{
+    use LightService\Organizer;
 
-  public function before_each($context) {
-    if ($context->current_action() == TwoAction::class) {
-      if ($context->user->role != 'admin')
-        return;
+    public function beforeEach($context)
+    {
+        if ($context->currentAction() == TwoAction::class) {
+            if ($context->user->role != 'admin') {
+                return;
+            }
 
-      $context->logger->info('admin is doing something');
+            $context->logger->info('admin is doing something');
+        }
     }
-  }
 
-  public function after_each($context) {
-    if ($context->current_action() == TwoAction::class) {
-      if ($context->user->role != 'admin')
-        return;
+    public function afterEach($context)
+    {
+        if ($context->currentAction() == TwoAction::class) {
+            if ($context->user->role != 'admin') {
+                return;
+            }
 
-      $context->logger->info('admin is doing something');
+            $context->logger->info('admin is doing something');
+        }
     }
-  }
 
-  public function around_each($context) {
-    $context->logger->info('admin is about to do (or already has done) something');
-  }
+    public function aroundEach($context)
+    {
+        $context->logger->info('admin is about to do (or already has done) something');
+    }
 
-  public static function call($context) {
-    return self::with($context)->reduce(...self::actions());
-  }
+    public static function call($context)
+    {
+        return self::with($context)->reduce(...self::actions());
+    }
 
-  public static function actions() {
-    return [
-      OneAction::class,
-      TwoAction::class,
-      ThreeAction::class
-    ];
-  }
+    public static function actions()
+    {
+        return [
+            OneAction::class,
+            TwoAction::class,
+            ThreeAction::class
+        ];
+    }
 }
 
-class TwoAction {
-  use LightService\Action;
+class TwoAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    $context->user->do_something();
-  }
+    protected function executed($context)
+    {
+        $context->user->doSomething();
+    }
 }
 ```
 
-Note how the action has no logging logic after this change. Also, you can target before and after action logic for specific actions, as the `$context->current_action()` will have the class name of the currently processed action. In the example above, logging will occur only for `TwoAction` and not for `OneAction` or `ThreeAction`.
+Note how the action has no logging logic after this change. Also, you can target before and after action logic for specific actions, as the `$context->currentAction()` will have the class name of the currently processed action. In the example above, logging will occur only for `TwoAction` and not for `OneAction` or `ThreeAction`.
 
 ### Expects and promises
 
@@ -474,30 +513,34 @@ The expects and promises functions are rules for the inputs/outputs of an action
 This is how it's used:
 
 ```php
-class FooAction {
-  use LightService\Action;
+class FooAction
+{
+    use LightService\Action;
 
-  private expects  = ['a', 'b'];
-  private promises = ['c'];
+    private $expects  = ['a', 'b'];
+    private $promises = ['c'];
 
-  private function executed($context) {
-    $context->c = $context->a + $context->b;
-  }
+    protected function executed($context)
+    {
+        $context->c = $context->a + $context->b;
+    }
 }
 ```
 
 For those who are utterly slothful, you can also set the `expects` and `promises` to a single string value if you're only dealing with one key.
 
 ```php
-class FooAction {
-  use LightService\Action;
+class FooAction
+{
+    use LightService\Action;
 
-  private expects  = 'a';
-  private promises = 'b';
+    private $expects  = 'a';
+    private $promises = 'b';
 
-  private function executed($context) {
-    $context->b = $context->a + 1;
-  }
+    protected function executed($context)
+    {
+        $context->b = $context->a + 1;
+    }
 }
 ```
 
@@ -508,15 +551,15 @@ The context allows you to convert itself to an array:
 ```php
 $result = GreetsSomeoneAction::execute(['name' => 'Scooby']);
 
-var_dump($result->to_array());
+var_dump($result->toArray());
 ```
 
-This will convert all of the key-values inside the context to an array. Optionally you can also pass true as the first arguement to the `to_array` function to have the context metadata included.
+This will convert all of the key-values inside the context to an array. Optionally you can also pass true as the first arguement to the `toArray` function to have the context metadata included.
 
 The context also allows you to query metadata kept inside the context:
 
-1. The current action (`$context->current_action();`)
-2. The current organizer (`$context->current_organizer();`)
+1. The current action (`$context->currentAction();`)
+2. The current organizer (`$context->currentOrganizer();`)
 3. The failure status of the context (`$context->failure();`)
 4. The success status of the context (`$context->success();`)
 5. The failure message if it exists (`$context->message();`)
@@ -532,37 +575,43 @@ If a key alias is set for a key which already exists inside the context, then an
 Say for example you have actions `AnAction` and `AnotherAction` that you've used in previous projects. `AnAction` provides `my_key` but `AnotherAction` needs to use that key but expects it to be called `key_alias` instead. You can use them together in an organizer like so:
 
 ```php
-class AnOrganizer {
-  use LightService\Organizer;
+class AnOrganizer
+{
+    use LightService\Organizer;
 
-  private $aliases = ['my_key' => 'key_alias'];
+    private $aliases = ['my_key' => 'key_alias'];
 
-  public static function call($order) {
-    return self::with(['order' => $order])->reduce(
-      AnAction::class,
-      AnotherAction::class,
-    );
-  }
+    public static function call($order)
+    {
+        return self::with(['order' => $order])->reduce(
+            AnAction::class,
+            AnotherAction::class,
+        );
+    }
 }
 
-class AnAction {
-  use LightService\Action;
+class AnAction
+{
+    use LightService\Action;
 
-  private $promises = 'my_key';
+    private $promises = 'my_key';
 
-  private function executed($context) {
-    $context->my_key = "value";
-  }
+    protected function executed($context)
+    {
+        $context->my_key = "value";
+    }
 }
 
-class AnotherAction {
-  use LightService\Action;
+class AnotherAction
+{
+    use LightService\Action;
 
-  private $expects = 'key_alias';
+    private $expects = 'key_alias';
 
-  private function executed($context) {
-    $context->key_alias;
-  }
+    protected function executed($context)
+    {
+        $context->key_alias;
+    }
 }
 ```
 
@@ -571,30 +620,36 @@ class AnotherAction {
 You can add some more structure to your error handling by taking advantage of error codes in the context. Normally, when something goes wrong in your actions, you fail the process by setting the context to failure:
 
 ```php
-class SomeAction {
-  use LightService\Action;
+class SomeAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    $context->fail("I don't like what happened here.");
-  }
+    protected function executed($context)
+    {
+        $context->fail("I don't like what happened here.");
+    }
 }
 ```
 
 However, you might need to handle the errors coming from your action pipeline differently. Using an error code can help you check what type of expected error occurred in the organizer, or in the actions.
 
 ```php
-class SomeAction {
-  use LightService\Action;
+class SomeAction
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    if (95 < $context->teapot->heat())
-      $context->fail("The teapot is not hot enough", 1234);
+    protected function executed($context)
+    {
+        if (95 < $context->teapot->heat()) {
+            $context->fail("The teapot is not hot enough", 1234);
+        }
 
-    # Make some tea
+      # Make some tea
 
-    if (2 < $context->sugar->amount())
-      $context->fail("There is not enough sugar for the tea", 5678);
-  }
+        if (2 < $context->sugar->amount()) {
+            $context->fail("There is not enough sugar for the tea", 5678);
+        }
+    }
 }
 ```
 
@@ -604,48 +659,54 @@ If this action were executed, then you can pull the error message like you would
 $result = SomeAction::execute();
 
 echo $result->message();
-> "The teapost is not hot enough"
+> "The teapot is not hot enough"
 
-echo $result->error_code();
+echo $result->errorCode();
 > 1234
 ```
 
 ### Action rollback
 
-Sometimes your action has to undo what it did when an error occurs. Think about a chain of actions where you need to persist records in your data store in one action and you have to call an external service in the next. What happens if there is an error when you call the external service? You want to remove the records you previously saved. You can do it now with the `rolled_back` function.
+Sometimes your action has to undo what it did when an error occurs. Think about a chain of actions where you need to persist records in your data store in one action and you have to call an external service in the next. What happens if there is an error when you call the external service? You want to remove the records you previously saved. You can do it now with the `rolledBack` function.
 
 ```php
-class SaveEntities {
-  use LightService\Action;
+class SaveEntities
+{
+    use LightService\Action;
 
-  private $expects = 'user';
+    private $expects = 'user';
 
-  private function executed($context) {
-    $context->user->save();
-  }
+    protected function executed($context)
+    {
+        $context->user->save();
+    }
 
-  private function rolled_back($executed) {
-    $context->user->destroy();
-  }
+    protected function rolledBack($executed)
+    {
+        $context->user->destroy();
+    }
 }
 ```
 
-You need to call the `fail_with_rollback` function to initiate a rollback for actions starting with the action where the failure was triggered.
+You need to call the `failWithRollback` function to initiate a rollback for actions starting with the action where the failure was triggered.
 
 ```php
-class CallSomeExternalAPI {
-  use LightService\Action;
+class CallSomeExternalAPI
+{
+    use LightService\Action;
 
-  private function executed($context) {
-    $api_call_result = SomeAPI::save_user($context->user);
+    protected function executed($context)
+    {
+        $api_call_result = SomeAPI::saveUser($context->user);
 
-    if ($api_call_result->failure)
-      $context->fail_with_rollback("Error when calling external API");
-  }
+        if ($api_call_result->failure) {
+            $context->failWithRollback("Error when calling external API");
+        }
+    }
 }
 ```
 
-Using the `rolled_back` function is optional for the actions in the chain. You shouldn't care about undoing non-persisted changes.
+Using the `rolledBack` function is optional for the actions in the chain. You shouldn't care about undoing non-persisted changes.
 
 The actions are rolled back in reversed order from the point of failure starting with the action that triggered it.
 
@@ -656,25 +717,28 @@ The Organizer - Action combination works really well for simple use cases. Howev
 Let's look at a piece of code that does basic data transformations:
 
 ```php
-class ExtractsTransformsLoadsData {
-  public static function run($connection) {
-    $context = RetrievesConnectionInfo::call($connection);
-    $context = PullsDataFromRemoteApi::call($context);
+class ExtractsTransformsLoadsData
+{
+    public static function run($connection)
+    {
+        $context = RetrievesConnectionInfo::call($connection);
+        $context = PullsDataFromRemoteApi::call($context);
 
-    $retrieved_items = $context->retrieved_items;
+        $retrieved_items = $context->retrieved_items;
 
-    if ($retrieved_items->empty)
-      NotifiesEngineeringTeamAction::execute($context);
+        if ($retrieved_items->empty) {
+            NotifiesEngineeringTeamAction::execute($context);
+        }
 
-    foreach($retrieved_items as $item) {
-      $context->item = $item;
-      TransformsData::call($context);
+        foreach ($retrieved_items as $item) {
+            $context->item = $item;
+            TransformsData::call($context);
+        }
+
+        $context = LoadsData::call($context);
+
+        return SendsNotifications::call($context);
     }
-
-    $context = LoadsData::call($context);
-
-    return SendsNotifications::call($context);
-  }
 }
 ```
 
@@ -683,28 +747,31 @@ The LightService::Context is initialized with the first action, that context is 
 Let's see how we could make it a bit more simpler with a declarative style:
 
 ```php
-class ExtractsTransformsLoadsData {
-  use LightService\Organizer;
+class ExtractsTransformsLoadsData
+{
+    use LightService\Organizer;
 
-  public static function call($connection) {
-    return self::with(['connection' => $connection])->reduce(...self::actions());
-  }
+    public static function call($connection)
+    {
+        return self::with(['connection' => $connection])->reduce(...self::actions());
+    }
 
-  public static function actions() {
-    return [
-      RetrievesConnectionInfo::class,
-      PullsDataFromRemoteApi::class,
-      self::reduce_if(
-        function($context) {
-          return array_empty($context->retrieved_items);
-        },
-        [ NotifiesEngineeringTeamAction::class ]
-      ),
-      self::iterate('retrieved_items', [ TransformsData::class ]),
-      LoadsData::class,
-      SendsNotifications::class
-    ];
-  }
+    public static function actions()
+    {
+        return [
+            RetrievesConnectionInfo::class,
+            PullsDataFromRemoteApi::class,
+            self::reduceIf(
+                function ($context) {
+                    return array_empty($context->retrieved_items);
+                },
+                [ NotifiesEngineeringTeamAction::class ]
+            ),
+            self::iterate('retrieved_items', [ TransformsData::class ]),
+            LoadsData::class,
+            SendsNotifications::class
+        ];
+    }
 }
 ```
 
@@ -712,56 +779,60 @@ This code is much easier to reason about, it's less noisy and it captures the go
 
 The 5 different orchestrator constructs an organizer can have:
 
-#### 1. `reduce_until`
+#### 1. `reduceUntil`
 
-`reduce_until` behaves like a while loop in imperative languages, it iterates until the provided predicate in the callback function evaluates to true.
+`reduceUntil` behaves like a while loop in imperative languages, it iterates until the provided predicate in the callback function evaluates to true.
 
 ```php
-class ReduceUntilOrganizer {
-  use LightService\Organizer;
+class ReduceUntilOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call($number) {
-    return self::with(['number' => $number])->reduce(
-      AddsOneAction::class,
-      self::reduce_until(
-        function($context) {
-          return 3 < $context->number;
-        },
-        [ AddsOneAction::class ]
-      )
-    );
-  }
+    public static function call($number)
+    {
+        return self::with(['number' => $number])->reduce(
+            AddsOneAction::class,
+            self::reduceUntil(
+                function ($context) {
+                    return 3 < $context->number;
+                },
+                [ AddsOneAction::class ]
+            )
+        );
+    }
 }
 ```
 
 In this case the organizer above takes a number, executes a couple of actions before reducing an array of actions (in this case only containing the `AddsOneAction`) until the number in the context is greater than 3.
 
-#### 2. `reduce_if`
+#### 2. `reduceIf`
 
-`reduce_if` will reduce the included actions if the predicate in the callback function evaluates to true.
+`reduceIf` will reduce the included actions if the predicate in the callback function evaluates to true.
 
 ```php
-class ReduceIfOrganizer {
-  use LightService\Organizer;
+class ReduceIfOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call($number) {
-    return self::with(['number' => $number])->reduce(
-      AddsOneAction::class,
-      self::reduce_if(
-        function($context) {
-          return 1 < $context->number;
-        },
-        [ AddsOneAction::class ]
-      ),
-      AddsOneAction::class
-    );
-  }
+    public static function call($number)
+    {
+        return self::with(['number' => $number])->reduce(
+            AddsOneAction::class,
+            self::reduceIf(
+                function ($context) {
+                    return 1 < $context->number;
+                },
+                [ AddsOneAction::class ]
+            ),
+            AddsOneAction::class
+        );
+    }
 }
 ```
 
 In this case the organizer above takes a number, executes a couple of actions before reducing an array of actions (in this case only containing the `AddsOneAction`) if the number in the context is greater than 1.
 
-A 3rd argument can be given to `reduce_if` which will be an array of actions to run if the predicate returns false.
+A 3rd argument can be given to `reduceIf` which will be an array of actions to run if the predicate returns false.
 
 #### 3. `iterate`
 
@@ -770,27 +841,31 @@ A 3rd argument can be given to `reduce_if` which will be an array of actions to 
 The organizer will singularize the key name and will put the actual item into the context under that name. Each element will be accessible by the singlular itme name for the actions in the iterate actions.
 
 ```php
-class IterateOrganizer {
-  use LightService\Organizer;
+class IterateOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call($context) {
-    return self::with($context)->reduce(
-      self::iterate('numbers', [
-        IterateAction::class,
-      ])
-    );
-  }
+    public static function call($context)
+    {
+        return self::with($context)->reduce(
+            self::iterate('numbers', [
+                IterateAction::class,
+            ])
+        );
+    }
 }
 
-class IterateAction {
-  use LightService\Action;
+class IterateAction
+{
+    use LightService\Action;
 
-  private $expects  = ['number'];
-  private $promises = ['number'];
+    private $expects  = ['number'];
+    private $promises = ['number'];
 
-  private function executed($context) {
-    $context->sum += $context->number;
-  }
+    protected function executed($context)
+    {
+        $context->sum += $context->number;
+    }
 }
 ```
 
@@ -803,34 +878,40 @@ To take advantage of another organizer or action, you might need to tweak the co
 That seems a lot of ceremony for a simple change. You can do that in an `execute` function like this:
 
 ```php
-class ExecuteOrganizer {
-  use LightService\Organizer;
+class ExecuteOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call($number) {
-    return self::with(['number' => $number])->reduce(
-      AddsOneAction::class,
-      self::execute(function($context) { $context->number += 1; })
-    );
-  }
+    public static function call($number)
+    {
+        return self::with(['number' => $number])->reduce(
+            AddsOneAction::class,
+            self::execute(function ($context) {
+                $context->number += 1;
+            })
+        );
+    }
 }
 ```
 
 In this case the organizer above simply changes the context in some way defined within the `execute` functions callback.
 
-#### 5. `add_to_context`
+#### 5. `addToContext`
 
-`add_to_context` can add key-value pairs on the fly to the context. This functionality is useful when you need a value injected into the context under a specific key right before the subsequent actions are executed.
+`addToContext` can add key-value pairs on the fly to the context. This functionality is useful when you need a value injected into the context under a specific key right before the subsequent actions are executed.
 
 ```php
-class AddToContextOrganizer {
-  use LightService\Organizer;
+class AddToContextOrganizer
+{
+    use LightService\Organizer;
 
-  public static function call() {
-    return self::with([])->reduce(
-      self::add_to_context(['number' => 0]),
-      AddsOneAction::class
-    );
-  }
+    public static function call()
+    {
+        return self::with([])->reduce(
+            self::addToContext(['number' => 0]),
+            AddsOneAction::class
+        );
+    }
 }
 ```
 
@@ -843,6 +924,50 @@ TODO - This will come one day.
 ### Logging
 
 TODO - This will come one day.
+
+## Development:
+
+Development runs entirely inside Docker, so there's no need for PHP, Composer
+or PHPUnit on your host machine.
+
+```
+docker compose run --rm --build php
+```
+
+That builds the image and runs the test suite. After the first build you can
+drop the `--build` flag.
+
+To run other commands inside the container:
+
+```
+docker compose run --rm php composer test                          # run the tests
+docker compose run --rm php composer test -- --filter ContextTest  # run a subset
+docker compose run --rm php composer test -- --coverage-text       # with coverage
+docker compose run --rm php composer lint                          # check coding standard
+docker compose run --rm php composer lint:fix                      # auto-fix coding standard
+docker compose run --rm php composer check                         # lint + analyse + test
+docker compose run --rm php composer analyse                       # static analysis
+docker compose run --rm php composer audit                         # check for advisories
+docker compose run --rm php composer outdated --direct             # check for updates
+docker compose run --rm php sh                                     # a shell
+```
+
+Your working directory is mounted into the container, so edits on the host take
+effect immediately. Dependencies live in a named volume rather than in the
+working directory, which keeps `vendor/` off your host.
+
+The image defaults to the latest PHP. To check your work against one of the
+other supported versions:
+
+```
+docker build --build-arg PHP_VERSION=8.2 -t light-service-php:8.2 .
+docker run --rm light-service-php:8.2
+```
+
+CI runs the suite against PHP 8.2, 8.3, 8.4 and 8.5 on every push, along
+with PHP_CodeSniffer, PHPStan, and `composer audit` against the Packagist
+security advisory database. One extra leg resolves the declared minimum
+dependency versions, since there is no committed lock file to pin them.
 
 ## Contributing
 

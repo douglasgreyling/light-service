@@ -2,17 +2,20 @@
 
 namespace LightService\Fixtures\Actions;
 
-class DuplicatePromisesAction {
+class DuplicatePromisesAction
+{
     use \LightService\Action;
 
     private $expects  = ['number'];
     private $promises = ['number', 'number', 'number'];
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $context->number += 1;
     }
 
-    private function rolled_back($context) {
+    protected function rolledBack($context)
+    {
         $context->number -= 1;
     }
 }

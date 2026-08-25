@@ -4,10 +4,12 @@ namespace LightService\Fixtures\Organizers;
 
 use LightService\Fixtures\Actions\DoesNothingAction;
 
-class DoesNothingOrganizer {
+class DoesNothingOrganizer
+{
     use \LightService\Organizer;
 
-    public static function call($context) {
+    public static function call($context)
+    {
         return self::with($context)->reduce(DoesNothingAction::class);
     }
 }

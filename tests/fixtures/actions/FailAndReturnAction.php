@@ -2,11 +2,13 @@
 
 namespace LightService\Fixtures\Actions;
 
-class FailAndReturnAction {
+class FailAndReturnAction
+{
     use \LightService\Action;
 
-    private function executed($context) {
-        $context->fail_and_return('foo');
+    protected function executed($context)
+    {
+        $context->failAndReturn('foo');
         $context->one = true;
     }
 }

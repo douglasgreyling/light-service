@@ -5,28 +5,33 @@ namespace LightService;
 use LightService\Context;
 use LightService\Orchestrator;
 use LightService\OrchestratorLogic;
-
 use LightService\Exception\NotImplementedException;
 
-trait Organizer {
+trait Organizer
+{
     use OrchestratorLogic;
 
     public $context;
 
-    public function __construct($context = []) {
+    // Final so that new static() in with() is safe.
+    final public function __construct($context = [])
+    {
         $this->context = new Context($context);
-        $this->context->set_current_organizer(self::class);
+        $this->context->setCurrentOrganizer(static::class);
     }
 
-    public static function call() {
-        throw new NotImplementedException;
+    public static function call()
+    {
+        throw new NotImplementedException();
     }
 
-    public static function with($context) {
-        return new self($context);
+    public static function with($context)
+    {
+        return new static($context);
     }
 
-    public function reduce(...$actions) {
+    public function reduce(...$actions)
+    {
         $action_orchestrator = new Orchestrator($this);
 
         $this->context = $action_orchestrator->run($actions);
@@ -34,19 +39,23 @@ trait Organizer {
         return $this->context;
     }
 
-    public function around_each($context) {
+    public function aroundEach($context)
+    {
         // no op
     }
 
-    public function before_each($context) {
+    public function beforeEach($context)
+    {
         // no op
     }
 
-    public function after_each($context) {
+    public function afterEach($context)
+    {
         // no op
     }
 
-    public function key_aliases() {
+    public function keyAliases()
+    {
         return isset($this->aliases) ? $this->aliases : [];
     }
 }

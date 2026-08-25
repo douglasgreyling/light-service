@@ -4,12 +4,14 @@ namespace LightService\Fixtures\Organizers;
 
 use LightService\Fixtures\Actions\AddsOneAction;
 
-class AddToContextOrganizer {
+class AddToContextOrganizer
+{
     use \LightService\Organizer;
 
-    public static function call() {
+    public static function call()
+    {
         return self::with([])->reduce(
-            self::add_to_context(['number' => 0]),
+            self::addToContext(['number' => 0]),
             AddsOneAction::class
         );
     }

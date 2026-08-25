@@ -2,10 +2,12 @@
 
 namespace LightService\Fixtures\Actions;
 
-class DoesNothingAction {
+class DoesNothingAction
+{
     use \LightService\Action;
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         //
     }
 }

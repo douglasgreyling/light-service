@@ -2,10 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-25
 
-Intended as the next major release. Every public method has been renamed, so
-this is a breaking change for all consumers.
+The first stable release. Every public method has been renamed, so this is a
+breaking change for everyone on 0.x.
 
 ### Changed
 

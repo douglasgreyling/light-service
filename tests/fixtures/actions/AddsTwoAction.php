@@ -2,17 +2,20 @@
 
 namespace LightService\Fixtures\Actions;
 
-class AddsTwoAction {
+class AddsTwoAction
+{
     use \LightService\Action;
 
     private $expects  = ['number'];
     private $promises = ['number'];
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $context->number += 2;
     }
 
-    private function rolled_back($context) {
+    protected function rolledBack($context)
+    {
         $context->number -= 2;
     }
 }

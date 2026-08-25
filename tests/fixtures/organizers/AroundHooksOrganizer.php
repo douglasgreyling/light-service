@@ -4,14 +4,17 @@ namespace LightService\Fixtures\Organizers;
 
 use LightService\Fixtures\Actions\SetsAAction;
 
-class AroundHooksOrganizer {
+class AroundHooksOrganizer
+{
     use \LightService\Organizer;
 
-    public function around_each($context) {
+    public function aroundEach($context)
+    {
         $context->a[] = 'around';
     }
 
-    public static function call() {
+    public static function call()
+    {
         return self::with(['a' => []])->reduce(
             SetsAAction::class
         );

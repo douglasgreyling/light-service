@@ -1,0 +1,22 @@
+parameters:
+    level: 5
+
+    paths:
+        - src
+        - tests/fixtures
+
+    # The library is consumed by composing its traits, so the fixtures are what
+    # give Action, Organizer and OrchestratorLogic a caller. Without them
+    # PHPStan reports the traits as unused and skips analysing them entirely.
+    ignoreErrors:
+        # The traits call no-op template hooks (rolled_back, executed) that a
+        # consumer overrides; PHPStan reads the default implementations as dead.
+        - identifier: method.resultUnused
+          path: tests/fixtures
+        - identifier: method.unused
+          path: tests/fixtures
+
+    # Check against the whole supported range rather than just the local runtime.
+    phpVersion:
+        min: 80200
+        max: 80599

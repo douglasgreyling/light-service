@@ -2,10 +2,12 @@
 
 namespace LightService\Fixtures\Actions;
 
-class FailingAction {
+class FailingAction
+{
     use \LightService\Action;
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $context->fail('foo');
     }
 }

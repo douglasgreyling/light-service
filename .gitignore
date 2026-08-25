@@ -1,6 +1,7 @@
 composer.lock
 composer.phar
 vendor/
-.phpunit.result.cache
+.phpunit.cache/
+coverage.xml
 .vscode
 .DS_Store

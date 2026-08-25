@@ -2,6 +2,7 @@
 
 namespace LightService\Fixtures\Organizers;
 
-class NoCallFunctionOrganizer {
+class NoCallFunctionOrganizer
+{
     use \LightService\Organizer;
 }

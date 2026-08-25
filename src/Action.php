@@ -3,102 +3,106 @@
 namespace LightService;
 
 use LightService\Context;
-
 use LightService\Exception\ExpectedKeysNotInContextException;
 use LightService\Exception\PromisedKeysNotInContextException;
 use LightService\Exception\NextActionException;
 use LightService\Exception\RollbackException;
 use LightService\Exception\NotImplementedException;
 
-trait Action {
+trait Action
+{
     private $context;
 
-    public function __construct($context = []) {
+    // Final so that new static() in execute() and rollback() is safe: a
+    // subclass cannot change the signature these call it with.
+    final public function __construct($context = [])
+    {
         $this->context = is_a($context, Context::class) ? $context : new Context($context);
-        $this->context->set_current_action(self::class);
+        $this->context->setCurrentAction(static::class);
     }
 
-    public function run() {
+    public function run()
+    {
         try {
-            $this->validate_expected_keys();
+            $this->validateKeys($this->expectedKeys(), ExpectedKeysNotInContextException::class);
             $this->executed($this->context);
-            $this->validate_promised_keys();
+            $this->validateKeys($this->promisedKeys(), PromisedKeysNotInContextException::class);
         } catch (NextActionException $e) {
             // no op
-        }
-        catch (RollbackException $e) {
-            $this->rolled_back($this->context);
+        } catch (RollbackException $e) {
+            $this->rolledBack($this->context);
         }
 
         return $this->context;
     }
 
-    public static function execute($context = []) {
-        return (new self($context))->run();
+    public static function execute($context = [])
+    {
+        return (new static($context))->run();
     }
 
-    public static function rollback($context = []) {
-        $action = new self($context);
-        $action->rolled_back($action->context());
+    public static function rollback($context = [])
+    {
+        $action = new static($context);
+        $action->rolledBack($action->context());
 
         return $action->context();
     }
 
-    public function context() {
+    public function context()
+    {
         return $this->context;
     }
 
-    public function expected_keys() {
-        $expected_keys = [];
-
-        if (isset($this->expects))
-            $expected_keys = is_array($this->expects) ? $this->expects : [$this->expects];
-
-        $expected_keys = array_unique($expected_keys);
-
-        return $expected_keys;
+    public function expectedKeys()
+    {
+        return $this->declaredKeys('expects');
     }
 
-    private function executed($context) {
+    public function promisedKeys()
+    {
+        return $this->declaredKeys('promises');
+    }
+
+    // $expects and $promises may each be a single key or a list of them.
+    private function declaredKeys($property)
+    {
+        if (!isset($this->$property)) {
+            return [];
+        }
+
+        $keys = is_array($this->$property) ? $this->$property : [$this->$property];
+
+        return array_values(array_unique($keys));
+    }
+
+    protected function executed($context)
+    {
         throw new NotImplementedException();
     }
 
-    private function rolled_back($context) {
+    protected function rolledBack($context)
+    {
         // no op
     }
 
-    private function validate_expected_keys() {
-        $expected_keys = $this->expected_keys();
+    private function validateKeys($keys, $exception_class)
+    {
+        $missing_keys = [];
 
-        $expected_keys_length = count($expected_keys);
-        $matched_keys         = array_keys($this->context->fetch($expected_keys));
+        foreach ($keys as $key) {
+            if (!$this->context->has($key)) {
+                $missing_keys[] = $key;
+            }
+        }
 
-        if ($expected_keys_length != count($matched_keys))
-            throw new ExpectedKeysNotInContextException(join(', ', array_diff($expected_keys, $matched_keys)));
+        if ($missing_keys) {
+            throw new $exception_class(join(', ', $missing_keys));
+        }
     }
 
-    private function validate_promised_keys() {
-        $promised_keys = $this->promised_keys();
-
-        $promised_keys_length = count($promised_keys);
-        $matched_keys         = array_keys($this->context->fetch($promised_keys));
-
-        if ($promised_keys_length != count($matched_keys))
-            throw new PromisedKeysNotInContextException(join(', ', array_diff($promised_keys, $matched_keys)));
-    }
-
-    private function promised_keys() {
-        $promised_keys = [];
-
-        if (isset($this->promises))
-            $promised_keys = is_array($this->promises) ? $this->promises : [$this->promises];
-
-        $promised_keys = array_unique($promised_keys);
-
-        return $promised_keys;
-    }
-
-    private function next_context() {
-        throw new NextActionException;
+    protected function nextContext()
+    {
+        throw new NextActionException();
     }
 }

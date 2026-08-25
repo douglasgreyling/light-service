@@ -2,13 +2,15 @@
 
 namespace LightService\Fixtures\Actions;
 
-class MissingSomePromisesAction {
+class MissingSomePromisesAction
+{
     use \LightService\Action;
 
     private $expects  = ['a', 'b'];
     private $promises = ['c', 'd'];
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $a = $context->a;
         $b = $context->b;
 
@@ -17,7 +19,8 @@ class MissingSomePromisesAction {
         $context->c = $c;
     }
 
-    private function adds($a, $b) {
+    private function adds($a, $b)
+    {
         return $a + $b;
     }
 }

@@ -3,24 +3,25 @@
 namespace LightService;
 
 use Exception;
-
 use LightService\ContextMetadata;
-
 use LightService\Exception\NextActionException;
 use LightService\Exception\RollbackException;
 use LightService\Exception\KeyAliasException;
 
-class Context extends \stdClass {
-    public function __construct($context = []) {
-        $this->setup_context($context);
+class Context extends \stdClass
+{
+    public function __construct($context = [])
+    {
+        $this->setupContext($context);
         $this->_metadata = new ContextMetadata();
     }
 
-    public function to_array($include_metadata = false) {
+    public function toArray($include_metadata = false)
+    {
         $array = (array) $this;
 
         if ($include_metadata) {
-            $array['_metadata'] = $this->_metadata->to_array();
+            $array['_metadata'] = $this->_metadata->toArray();
         } else {
             unset($array['_metadata']);
         }
@@ -28,104 +29,136 @@ class Context extends \stdClass {
         return $array;
     }
 
-    public function failure() {
+    public function failure()
+    {
         return $this->_metadata->failure;
     }
 
-    public function success() {
+    public function success()
+    {
         return $this->_metadata->success;
     }
 
-    public function message() {
+    public function message()
+    {
         return $this->_metadata->message;
     }
 
-    public function fetch($keys) {
-        return array_intersect_key($this->to_array(), array_flip($keys));
+    // Membership test that does not build a copy of the whole context the way
+    // fetch() and keys() do. A key explicitly set to null counts as present,
+    // matching what fetch() reports.
+    public function has($key)
+    {
+        return $key !== '_metadata' && property_exists($this, $key);
     }
 
-    public function keys() {
-        return array_keys($this->to_array());
+    public function fetch($keys)
+    {
+        return array_intersect_key($this->toArray(), array_flip($keys));
     }
 
-    public function values() {
-        return array_values($this->to_array());
+    public function keys()
+    {
+        return array_keys($this->toArray());
     }
 
-    public function merge($kvs) {
-        foreach($kvs as $k => $v)
+    public function values()
+    {
+        return array_values($this->toArray());
+    }
+
+    public function merge($kvs)
+    {
+        foreach ($kvs as $k => $v) {
             $this->$k = $v;
+        }
 
         return $this;
     }
 
-    public function &__get($key)  {
-        return $this->$key;
+    // Deliberately not by reference: returning a reference to $this->$key would
+    // create the key as a side effect of merely reading it. Returning by value
+    // also makes PHP report an append to an uninitialised key rather than
+    // silently discarding it.
+    public function __get($key)
+    {
+        return null;
     }
 
-    public function array_merge($kvs) {
-        return $this->merge($kvs);
-    }
-
-    public function fail($message = '', $error_code = '') {
+    public function fail($message = '', $error_code = '')
+    {
         $this->_metadata->fail($message, $error_code);
     }
 
-    public function fail_and_return($message = '', $error_code = '') {
+    public function failAndReturn($message = '', $error_code = '')
+    {
         $this->fail($message, $error_code);
-        throw new NextActionException;
+        throw new NextActionException();
     }
 
-    public function fail_with_rollback($message = '', $error_code = '') {
+    public function failWithRollback($message = '', $error_code = '')
+    {
         $this->fail($message, $error_code);
         $this->_metadata->rollback = true;
-        throw new RollbackException;
+        throw new RollbackException();
     }
 
-    public function skip_remaining($message = '') {
+    public function skipRemaining($message = '')
+    {
         $this->_metadata->skip_remaining = true;
         $this->_metadata->message = $message;
     }
 
-    public function must_skip_all_remaining_actions() {
+    public function mustSkipAllRemainingActions()
+    {
         return $this->_metadata->skip_remaining;
     }
 
-    public function current_action() {
+    public function currentAction()
+    {
         return $this->_metadata->current_action;
     }
 
-    public function set_current_action($action) {
+    public function setCurrentAction($action)
+    {
         $this->_metadata->current_action = $action;
     }
 
-    public function set_current_organizer($organizer) {
+    public function setCurrentOrganizer($organizer)
+    {
         $this->_metadata->current_organizer = $organizer;
     }
 
-    public function current_organizer() {
+    public function currentOrganizer()
+    {
         return $this->_metadata->current_organizer;
     }
 
-    public function use_aliases($aliases) {
-        $clashing_keys_and_key_aliases = array_intersect($this->keys(), array_values($aliases));
-        $clashing_key_aliases          = array_keys($clashing_keys_and_key_aliases);
+    public function useAliases($aliases)
+    {
+        // array_intersect keeps the names; array_keys() on it would give their
+        // positions in keys(), which is what used to reach the message.
+        $clashing_key_aliases = array_intersect($this->keys(), array_values($aliases));
 
-        if (0 < count($clashing_key_aliases))
+        if ($clashing_key_aliases) {
             throw new KeyAliasException(join(', ', $clashing_key_aliases));
+        }
 
-        foreach($aliases as $key => $key_alias) {
+        foreach ($aliases as $key => $key_alias) {
             $this->$key_alias = $this->$key;
             unset($this->$key);
         }
     }
 
-    public function error_code() {
+    public function errorCode()
+    {
         return $this->_metadata->error_code;
     }
 
-    private function setup_context($initial_context) {
-        foreach($initial_context as $k => $v)
+    private function setupContext($initial_context)
+    {
+        foreach ($initial_context as $k => $v) {
             $this->$k = $v;
+        }
     }
 }

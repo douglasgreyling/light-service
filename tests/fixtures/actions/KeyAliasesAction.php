@@ -2,12 +2,14 @@
 
 namespace LightService\Fixtures\Actions;
 
-class KeyAliasesAction {
+class KeyAliasesAction
+{
     use \LightService\Action;
 
     private $expects = 'num_alias';
 
-    private function executed($context) {
+    protected function executed($context)
+    {
         $context->num_alias += 1;
     }
 }

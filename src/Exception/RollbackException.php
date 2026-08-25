@@ -4,6 +4,7 @@ namespace LightService\Exception;
 
 use LightService\Exception\ContextException;
 
-class RollbackException extends ContextException {
+class RollbackException extends ContextException
+{
     //
 }

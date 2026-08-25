@@ -1,46 +1,53 @@
 <?php
 
+namespace LightService\Tests\Unit;
+
 use PHPUnit\Framework\TestCase;
-
 use LightService\Context;
-
 use LightService\Exception\NextActionException;
 use LightService\Exception\KeyAliasException;
 
-final class ContextTest extends TestCase {
-    public function test_it_is_instantiated_with_an_empty_context_when_given_no_state() {
+final class ContextTest extends TestCase
+{
+    public function testItIsInstantiatedWithAnEmptyContextWhenGivenNoState()
+    {
         $context = new Context();
 
-        $this->assertEmpty($context->to_array());
+        $this->assertEmpty($context->toArray());
     }
 
-    public function test_it_is_instantiated_with_a_context_based_on_its_given_state() {
+    public function testItIsInstantiatedWithAContextBasedOnItsGivenState()
+    {
         $state   = ['a' => 1, 'b' => 2];
         $context = new Context($state);
 
-        $this->assertEquals(['a' => 1, 'b' => 2], $context->to_array());
+        $this->assertEquals(['a' => 1, 'b' => 2], $context->toArray());
     }
 
-    public function test_it_is_instantiated_with_a_context_failure_flag_of_false() {
+    public function testItIsInstantiatedWithAContextFailureFlagOfFalse()
+    {
         $context = new Context();
 
         $this->assertFalse($context->failure());
     }
 
-    public function test_it_is_instantiated_with_a_context_success_flag_of_true() {
+    public function testItIsInstantiatedWithAContextSuccessFlagOfTrue()
+    {
         $context = new Context();
 
         $this->assertTrue($context->success());
     }
 
-    public function test_it_can_convert_itself_to_an_array() {
+    public function testItCanConvertItselfToAnArray()
+    {
         $state   = ['a' => 1, 'b' => 2];
         $context = new Context($state);
 
-        $this->assertEquals(['a' => 1, 'b' => 2], $context->to_array());
+        $this->assertEquals(['a' => 1, 'b' => 2], $context->toArray());
     }
 
-    public function test_can_convert_itself_to_an_array_including_its_metadata() {
+    public function testCanConvertItselfToAnArrayIncludingItsMetadata()
+    {
         $state   = ['a' => 1, 'b' => 2];
         $context = new Context($state);
 
@@ -60,18 +67,22 @@ final class ContextTest extends TestCase {
                     'executed_actions'  => []
                 ]
             ],
-            $context->to_array(true));
+            $context->toArray(true)
+        );
     }
 
-    public function test_it_fetches_values_from_the_context_like_an_object() {
+    public function testItFetchesValuesFromTheContextLikeAnObject()
+    {
         $context = new Context(['a' => 1]);
 
         $this->assertEquals(1, $context->a);
     }
 
-    public function test_it_can_set_values_like_properties_of_an_object() {
+    public function testItCanSetValuesLikePropertiesOfAnObject()
+    {
         $context = new Context();
 
+        $context->a = [];
         $context->a[] = 1;
         $context->b = 0;
         $context->b += 1;
@@ -84,54 +95,52 @@ final class ContextTest extends TestCase {
                 'b' => 1,
                 'c' => 'foobar'
             ],
-            $context->to_array()
+            $context->toArray()
         );
     }
 
-    public function test_it_returns_a_value_of_null_when_the_property_being_fetched_does_not_exist_in_the_context() {
+    public function testItReturnsAValueOfNullWhenThePropertyBeingFetchedDoesNotExistInTheContext()
+    {
         $context = new Context(['a' => 1]);
 
         $this->assertNull($context->b);
     }
 
-    public function test_it_can_merge_a_set_of_key_value_pairs_into_the_context_using_the_merge_function() {
+    public function testItCanMergeASetOfKeyValuePairsIntoTheContextUsingTheMergeFunction()
+    {
         $context = new Context(['a' => 1]);
 
         $context->merge(['b' => 2, 'c' => 3]);
 
-        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->to_array());
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->toArray());
     }
 
-    public function test_it_can_merge_a_set_of_key_value_pairs_into_the_context_using_the_array_merge_function() {
-        $context = new Context(['a' => 1]);
-
-        $context->array_merge(['b' => 2, 'c' => 3]);
-
-        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $context->to_array());
-    }
-
-    public function test_it_can_retrieve_keys_inside_the_context_with_the_keys_function() {
+    public function testItCanRetrieveKeysInsideTheContextWithTheKeysFunction()
+    {
         $state   = ['a' => 1, 'b' => 2];
         $context = new Context($state);
 
         $this->assertEquals(['a', 'b'], $context->keys());
     }
 
-    public function test_it_can_retrieve_the_values_inside_the_context_with_the_values_function() {
+    public function testItCanRetrieveTheValuesInsideTheContextWithTheValuesFunction()
+    {
         $state   = ['a' => 1, 'b' => 2];
         $context = new Context($state);
 
         $this->assertEquals([1, 2], $context->values());
     }
 
-    public function test_it_can_retrieve_multiple_key_value_pairs_using_the_fetch_function() {
+    public function testItCanRetrieveMultipleKeyValuePairsUsingTheFetchFunction()
+    {
         $state   = ['a' => 1, 'b' => 2, 'c' => 3];
         $context = new Context($state);
 
         $this->assertEquals(['a' => 1, 'c' => 3], $context->fetch(['a', 'c']));
     }
 
-    public function test_it_marks_the_failure_flag_as_true_and_the_success_flag_as_false_when_the_context_is_explicitly_failed() {
+    public function testItMarksTheFailureFlagAsTrueAndTheSuccessFlagAsFalseWhenTheContextIsExplicitlyFailed()
+    {
         $state   = ['a' => 1, 'b' => 2, 'c' => 3];
         $context = new Context($state);
 
@@ -140,7 +149,8 @@ final class ContextTest extends TestCase {
         $this->assertTrue($context->failure());
     }
 
-    public function test_it_can_add_an_additional_failure_message_when_the_context_is_explicitly_failed() {
+    public function testItCanAddAnAdditionalFailureMessageWhenTheContextIsExplicitlyFailed()
+    {
         $state   = ['a' => 1, 'b' => 2, 'c' => 3];
         $context = new Context($state);
 
@@ -149,12 +159,13 @@ final class ContextTest extends TestCase {
         $this->assertEquals('foo', $context->message());
     }
 
-    public function test_it_can_mark_the_failure_flag_as_true_and_throw_a_NextActionException_when_the_fail_and_return_function_is_called() {
+    public function testItCanMarkTheFailureFlagAsTrueAndThrowANextActionExceptionWhenTheFailAndReturnFunctionIsCalled()
+    {
         $context                  = new Context();
         $correct_exception_thrown = false;
 
         try {
-            $context->fail_and_return('foo');
+            $context->failAndReturn('foo');
         } catch (NextActionException $e) {
             $correct_exception_thrown = true;
         }
@@ -163,60 +174,80 @@ final class ContextTest extends TestCase {
         $this->assertTrue($context->failure());
     }
 
-    public function test_it_can_mark_the_skip_remaining_flag_when_the_skip_remaining_function_is_called() {
+    public function testItCanMarkTheSkipRemainingFlagWhenTheSkipRemainingFunctionIsCalled()
+    {
         $context = new Context();
 
-        $context->skip_remaining();
+        $context->skipRemaining();
 
-        $this->assertTrue($context->must_skip_all_remaining_actions());
+        $this->assertTrue($context->mustSkipAllRemainingActions());
     }
 
-    public function test_it_can_set_and_get_the_current_action() {
+    public function testItCanSetAndGetTheCurrentAction()
+    {
         $context = new Context();
 
-        $context->set_current_action('SomeAction');
+        $context->setCurrentAction('SomeAction');
 
-        $this->assertEquals('SomeAction', $context->current_action());
+        $this->assertEquals('SomeAction', $context->currentAction());
     }
 
-    public function test_it_can_set_and_get_the_current_organizer() {
+    public function testItCanSetAndGetTheCurrentOrganizer()
+    {
         $context = new Context();
 
-        $context->set_current_organizer('SomeOrganizer');
+        $context->setCurrentOrganizer('SomeOrganizer');
 
-        $this->assertEquals('SomeOrganizer', $context->current_organizer());
+        $this->assertEquals('SomeOrganizer', $context->currentOrganizer());
     }
 
-    public function test_it_can_use_a_set_of_key_aliases_to_change_the_context() {
+    public function testItCanUseASetOfKeyAliasesToChangeTheContext()
+    {
         $context = new Context(['a' => 'value']);
-        $context->use_aliases(['a' => 'an_alias_for_a']);
+        $context->useAliases(['a' => 'an_alias_for_a']);
 
         $this->assertEquals('value', $context->an_alias_for_a);
-        $this->assertEquals(['an_alias_for_a' => 'value'], $context->to_array());
+        $this->assertEquals(['an_alias_for_a' => 'value'], $context->toArray());
     }
 
-    public function test_it_throws_an_exception_when_it_attempts_to_use_and_set_a_key_alias_which_already_exists_inside_the_context() {
+    public function testItThrowsAnExceptionWhenItAttemptsToUseAndSetAKeyAliasWhichAlreadyExistsInsideTheContext()
+    {
         $this->expectException(KeyAliasException::class);
 
         $context = new Context(['a' => 'value', 'an_alias_for_a' => 'some other value']);
-        $context->use_aliases(['a' => 'an_alias_for_a']);
+        $context->useAliases(['a' => 'an_alias_for_a']);
     }
 
-    public function test_it_can_fail_a_context_with_an_error_code() {
+    public function testTheKeyAliasClashExceptionNamesTheClashingKey()
+    {
+        $context = new Context(['a' => 'value', 'an_alias_for_a' => 'some other value']);
+
+        try {
+            $context->useAliases(['a' => 'an_alias_for_a']);
+            $this->fail('Expected a KeyAliasException');
+        } catch (KeyAliasException $e) {
+            // It used to report the key's position in keys() rather than its name.
+            $this->assertStringContainsString('an_alias_for_a', $e->getMessage());
+        }
+    }
+
+    public function testItCanFailAContextWithAnErrorCode()
+    {
         $context = new Context();
 
         $context->fail('Something went wrong', 4001);
 
         $this->assertEquals('Something went wrong', $context->message());
-        $this->assertEquals($context->error_code(), 4001);
+        $this->assertEquals($context->errorCode(), 4001);
     }
 
-    public function test_it_can_fail_a_context_and_skip_to_the_next_action_with_an_error_code() {
+    public function testItCanFailAContextAndSkipToTheNextActionWithAnErrorCode()
+    {
         $context                  = new Context();
         $correct_exception_thrown = false;
 
         try {
-            $context->fail_and_return('Something went wrong', 4001);
+            $context->failAndReturn('Something went wrong', 4001);
         } catch (NextActionException $e) {
             $correct_exception_thrown = true;
         }
@@ -224,16 +255,28 @@ final class ContextTest extends TestCase {
         $this->assertTrue($correct_exception_thrown);
         $this->assertTrue($context->failure());
         $this->assertEquals('Something went wrong', $context->message());
-        $this->assertEquals(4001, $context->error_code());
+        $this->assertEquals(4001, $context->errorCode());
     }
 
-    public function test_it_sets_a_undefined_key_with_a_value_of_null_when_called_for_the_first_time() {
+    public function testItReturnsNullForAnUndefinedKeyWithoutAddingItToTheContext()
+    {
         $context = new Context();
 
         $result = $context->foo;
-        // $context->__get('bar');
 
-        // $this->assertEquals(['foo' => null], $context->to_array());
         $this->assertNull($result);
+        $this->assertEquals([], $context->toArray());
+        $this->assertEquals([], $context->keys());
+    }
+
+    public function testItDoesNotAddAKeyToTheContextWhenAnUndefinedKeyIsOnlyChecked()
+    {
+        $context = new Context(['a' => 1]);
+
+        if ($context->some_flag) {
+            // reading it is enough to have created it before
+        }
+
+        $this->assertEquals(['a' => 1], $context->toArray());
     }
 }

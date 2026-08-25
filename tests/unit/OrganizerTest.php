@@ -1,12 +1,15 @@
 <?php
 
+namespace LightService\Tests\Unit;
+
 use PHPUnit\Framework\TestCase;
-
 use LightService\Exception\NotImplementedException;
-
+use LightService\Exception\KeyIsNotIterableException;
+use RuntimeException;
 use LightService\Fixtures\Organizers\{
     AddToContextOrganizer,
     AllHooksOrganizer,
+    BaseNameOrganizer,
     AroundEachOrganizer,
     BeforeAfterEachOrganizer,
     DoesNothingOrganizer,
@@ -15,58 +18,81 @@ use LightService\Fixtures\Organizers\{
     FailingOrganizer,
     IterateOrganizer,
     IterateOrganizerWithOrchestrators,
+    IterateOverAMissingKeyOrganizer,
+    IterateOverANonIterableOrganizer,
+    IterateRollbackOrganizer,
+    IterateStopsOnFailureOrganizer,
+    IterateStopsOnSkipOrganizer,
+    IterateWithExistingSingularKeyOrganizer,
+    IterateWithHooksOrganizer,
     KeyAliasesOrganizer,
     NoCallFunctionOrganizer,
     OneSkipOrganizer,
     ReduceIfOrganizer,
     ReduceIfOrganizerWithFalseActions,
     ReduceUntilOrganizer,
+    ReduceUntilStopsOnFailureOrganizer,
+    ReduceTwiceAfterRollbackOrganizer,
+    ReduceUntilStopsOnSkipOrganizer,
+    RepeatedActionRollbackOrganizer,
+    RollbackAtEndOfChainOrganizer,
     RollbackOrchestratorLogicOrganizer,
     RollbackOrganizer,
     SkipRemainingOrchestratorLogicOrganizer,
     SkipRemainingOrganizer,
-    SuccessfulOrganizer
+    SpecialisedNameOrganizer,
+    SuccessfulOrganizer,
+    ThrowingActionWithAliasesOrganizer,
+    ThrowingActionWithHooksOrganizer
 };
 
-final class OrganizerTest extends TestCase {
-    public function test_it_throws_an_error_when_the_call_function_is_not_implemented() {
+final class OrganizerTest extends TestCase
+{
+    public function testItThrowsAnErrorWhenTheCallFunctionIsNotImplemented()
+    {
         $this->expectException(NotImplementedException::class);
 
         NoCallFunctionOrganizer::call();
     }
 
-    public function test_it_instantiates_an_organizer_with_the_given_context_when_using_the_with_function() {
+    public function testItInstantiatesAnOrganizerWithTheGivenContextWhenUsingTheWithFunction()
+    {
         $result = DoesNothingOrganizer::call(['a' => 1]);
 
-        $this->assertEquals(['a' => 1], $result->to_array());
+        $this->assertEquals(['a' => 1], $result->toArray());
     }
 
-    public function test_it_instantiates_the_organizer_context_with_the_class_of_the_organizer() {
+    public function testItInstantiatesTheOrganizerContextWithTheClassOfTheOrganizer()
+    {
         $result = DoesNothingOrganizer::call(['a' => 1]);
 
-        $this->assertEquals(DoesNothingOrganizer::class, $result->current_organizer());
+        $this->assertEquals(DoesNothingOrganizer::class, $result->currentOrganizer());
     }
 
-    public function test_it_executes_all_of_the_actions_provided_to_it_where_they_are_applicable() {
+    public function testItExecutesAllOfTheActionsProvidedToItWhereTheyAreApplicable()
+    {
         $result = SuccessfulOrganizer::call(0);
 
-        $this->assertEquals(['number' => 3], $result->to_array());
+        $this->assertEquals(['number' => 3], $result->toArray());
     }
 
-    public function test_it_will_skip_actions_which_call_the_next_context_function() {
+    public function testItWillSkipActionsWhichCallTheNextContextFunction()
+    {
         $result = OneSkipOrganizer::call(0);
 
-        $this->assertEquals(['number' => 2], $result->to_array());
+        $this->assertEquals(['number' => 2], $result->toArray());
     }
 
-    public function test_it_marks_the_context_as_a_success_when_nothing_goes_wrong() {
+    public function testItMarksTheContextAsASuccessWhenNothingGoesWrong()
+    {
         $result = SuccessfulOrganizer::call(0);
 
         $this->assertTrue($result->success());
         $this->assertFalse($result->failure());
     }
 
-    public function test_it_marks_the_context_as_a_failure_when_an_action_fails_the_context() {
+    public function testItMarksTheContextAsAFailureWhenAnActionFailsTheContext()
+    {
         $result = FailingOrganizer::call(0);
 
         $this->assertFalse($result->success());
@@ -74,39 +100,45 @@ final class OrganizerTest extends TestCase {
         $this->assertEquals('foo', $result->message());
     }
 
-    public function test_it_stops_executing_remaining_actions_when_an_actions_fails_the_context() {
+    public function testItStopsExecutingRemainingActionsWhenAnActionsFailsTheContext()
+    {
         $result = FailingOrganizer::call(0);
 
         $this->assertFalse($result->success());
         $this->assertTrue($result->failure());
-        $this->assertEquals(['number' => 1], $result->to_array());
+        $this->assertEquals(['number' => 1], $result->toArray());
     }
 
-    public function test_it_shows_the_failure_message_when_an_action_fails_the_context() {
+    public function testItShowsTheFailureMessageWhenAnActionFailsTheContext()
+    {
         $result = FailingOrganizer::call(0);
 
         $this->assertEquals('foo', $result->message());
     }
 
-    public function test_it_can_skip_remaining_action_by_using_the_skip_remaining_on_the_context() {
+    public function testItCanSkipRemainingActionByUsingTheSkipRemainingOnTheContext()
+    {
         $result = SkipRemainingOrganizer::call(0);
 
-        $this->assertEquals(['number' => 1], $result->to_array());
+        $this->assertEquals(['number' => 1], $result->toArray());
     }
 
-    public function test_it_can_execute_before_and_after_actions() {
+    public function testItCanExecuteBeforeAndAfterActions()
+    {
         $result = BeforeAfterEachOrganizer::call();
 
-        $this->assertEquals(['hooks_called' => ['before', 'after', 'before', 'after']], $result->to_array());
+        $this->assertEquals(['hooks_called' => ['before', 'after', 'before', 'after']], $result->toArray());
     }
 
-    public function test_it_can_execute_around_each_actions() {
+    public function testItCanExecuteAroundEachActions()
+    {
         $result = AroundEachOrganizer::call();
 
-        $this->assertEquals(['hook_count' => 4], $result->to_array());
+        $this->assertEquals(['hook_count' => 4], $result->toArray());
     }
 
-    public function test_it_can_execute_around_before_and_each_actions_in_the_correct_order() {
+    public function testItCanExecuteAroundBeforeAndEachActionsInTheCorrectOrder()
+    {
         $result = AllHooksOrganizer::call();
 
         $this->assertEquals(
@@ -122,98 +154,252 @@ final class OrganizerTest extends TestCase {
                     'around'
                 ]
             ],
-            $result->to_array()
+            $result->toArray()
         );
     }
 
-    public function test_it_can_use_set_key_aliases_for_keys_in_the_context() {
+    public function testItCanUseSetKeyAliasesForKeysInTheContext()
+    {
         $result = KeyAliasesOrganizer::call(1);
 
-        $this->assertEquals(['number' => 4], $result->to_array());
+        $this->assertEquals(['number' => 4], $result->toArray());
     }
 
-    public function test_it_can_rollback_a_set_of_actions() {
+    public function testItCanRollbackASetOfActions()
+    {
         $result = RollbackOrganizer::call(1);
 
-        $this->assertEquals(['number' => 0], $result->to_array());
+        $this->assertEquals(['number' => 0], $result->toArray());
         $this->assertEquals('I want to roll back!', $result->message());
     }
 
-    public function test_it_will_reduce_an_action_if_the_predicate_returns_true_in_the_reduce_if_orchestrator_logic_function() {
+    public function testItWillReduceAnActionIfThePredicateReturnsTrueInTheReduceIfOrchestratorLogicFunction()
+    {
         $result = ReduceIfOrganizer::call(1);
 
-        $this->assertEquals(['number' => 4], $result->to_array());
+        $this->assertEquals(['number' => 4], $result->toArray());
     }
 
-    public function test_it_will_not_reduce_an_action_if_the_predicate_returns_false_in_the_reduce_if_orchestrator_logic_function() {
+    public function testItWillNotReduceAnActionIfThePredicateReturnsFalseInTheReduceIfOrchestratorLogicFunction()
+    {
         $result = ReduceIfOrganizer::call(-3);
 
-        $this->assertEquals(['number' => -1], $result->to_array());
+        $this->assertEquals(['number' => -1], $result->toArray());
     }
 
-    public function test_it_will_reduce_the_first_set_of_provided_actions_if_the_predicate_is_true() {
+    public function testItWillReduceTheFirstSetOfProvidedActionsIfThePredicateIsTrue()
+    {
         $result = ReduceIfOrganizerWithFalseActions::call(2);
 
-        $this->assertEquals(['number' => 5], $result->to_array());
+        $this->assertEquals(['number' => 5], $result->toArray());
     }
 
-    public function test_it_will_reduce_the_first_set_of_provided_actions_if_the_predicate_is_false() {
+    public function testItWillReduceTheFirstSetOfProvidedActionsIfThePredicateIsFalse()
+    {
         $result = ReduceIfOrganizerWithFalseActions::call(0);
 
-        $this->assertEquals(['number' => 4], $result->to_array());
+        $this->assertEquals(['number' => 4], $result->toArray());
     }
 
-    public function test_it_will_reduce_actions_until_the_predicate_returns_true_in_the_reduce_until_orchestrator_logic_function() {
+    public function testItWillReduceActionsUntilThePredicateReturnsTrueInTheReduceUntilOrchestratorLogicFunction()
+    {
         $result = ReduceUntilOrganizer::call(0);
 
-        $this->assertEquals(['number' => 4], $result->to_array());
+        $this->assertEquals(['number' => 4], $result->toArray());
     }
 
-    public function test_it_will_reduce_actions_when_the_predicate_returns_false_in_the_reduce_until_orchestrator_logic_function() {
+    public function testItWillReduceActionsWhenThePredicateReturnsFalseInTheReduceUntilOrchestratorLogicFunction()
+    {
         $result = ReduceUntilOrganizer::call(5);
 
-        $this->assertEquals(['number' => 6], $result->to_array());
+        $this->assertEquals(['number' => 6], $result->toArray());
     }
 
-    public function test_it_will_execute_a_given_callback_action_when_the_execute_orchestrator_logic_function_is_used() {
+    public function testItWillExecuteAGivenCallbackActionWhenTheExecuteOrchestratorLogicFunctionIsUsed()
+    {
         $result = ExecuteOrganizer::call(0);
 
-        $this->assertEquals(['number' => 2], $result->to_array());
+        $this->assertEquals(['number' => 2], $result->toArray());
     }
 
-    public function test_it_will_add_kvs_to_the_context_with_the_add_to_context_orchestrator_logic_function() {
+    public function testItWillAddKvsToTheContextWithTheAddToContextOrchestratorLogicFunction()
+    {
         $result = AddToContextOrganizer::call(0);
 
-        $this->assertEquals(['number' => 1], $result->to_array());
+        $this->assertEquals(['number' => 1], $result->toArray());
     }
 
-    public function test_it_will_iterate_over_value_for_a_given_key_and_execute_a_set_of_actions_with_the_iterate_orchestrator_logic_function() {
+    public function testItIteratesOverAGivenKeyAndExecutesActionsViaTheIterateFunction()
+    {
         $result = IterateOrganizer::call(['numbers' => [1, 2, 3], 'sum' => 0]);
 
-        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 6], $result->to_array());
+        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 6], $result->toArray());
     }
 
-    public function test_it_will_iterate_using_orchestrators() {
+    public function testItWillIterateUsingOrchestrators()
+    {
         $result = IterateOrganizerWithOrchestrators::call(['numbers' => [1, 2, 3], 'sum' => 0]);
 
-        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 9], $result->to_array());
+        $this->assertEquals(['numbers' => [1, 2, 3], 'sum' => 9], $result->toArray());
     }
 
-    public function test_it_will_rollback_all_the_actions_when_orchestrator_logic_functions_are_used() {
+    public function testItWillRollbackAllTheActionsWhenOrchestratorLogicFunctionsAreUsed()
+    {
         $result = RollbackOrchestratorLogicOrganizer::call(0);
 
-        $this->assertEquals(['number' => -1], $result->to_array());
+        $this->assertEquals(['number' => -1], $result->toArray());
     }
 
-    public function test_it_will_stop_running_all_the_actions_when_the_context_is_marked_as_a_failure_and_orchestrator_logic_functions_are_used() {
+    public function testItStopsRunningActionsWhenTheContextFailsAndOrchestratorLogicIsUsed()
+    {
         $result = FailingOrchestratorLogicOrganizer::call(0);
 
-        $this->assertEquals(['number' => 5], $result->to_array());
+        $this->assertEquals(['number' => 5], $result->toArray());
     }
 
-    public function test_it_will_skip_all_remaining_actions_when_marked_to_skip_all_reamining_actions_and_orchestrator_logic_functions_are_used() {
+    public function testItSkipsRemainingActionsWhenMarkedToSkipAndOrchestratorLogicIsUsed()
+    {
         $result = SkipRemainingOrchestratorLogicOrganizer::call(0);
 
-        $this->assertEquals(['number' => 5], $result->to_array());
+        $this->assertEquals(['number' => 5], $result->toArray());
+    }
+    public function testItRollsBackPrecedingActionsWhenTheRollingBackActionIsLastInTheChain()
+    {
+        // Two AddsOne then a rollback: +2, the rolling-back action undoes 1 of
+        // its own, and the two AddsOne actions are then replayed backwards.
+        $result = RollbackAtEndOfChainOrganizer::call(1);
+
+        $this->assertEquals(0, $result->number);
+        $this->assertTrue($result->failure());
+    }
+
+    public function testItRollsBackPrecedingActionsWhenTheRollingBackActionClassAppearsEarlierInTheChain()
+    {
+        $result = RepeatedActionRollbackOrganizer::call(0);
+
+        $this->assertEquals(0, $result->number);
+        // One from the failing action undoing itself, one from replaying the
+        // earlier occurrence of the same class.
+        $this->assertCount(2, $result->rolled_back_actions);
+    }
+
+    public function testItRunsTheSubclassWhenAnOrganizerIsExtended()
+    {
+        $result = SpecialisedNameOrganizer::call();
+
+        $this->assertEquals(SpecialisedNameOrganizer::class, $result->currentOrganizer());
+        $this->assertEquals(BaseNameOrganizer::class, BaseNameOrganizer::call()->currentOrganizer());
+    }
+    public function testReduceUntilStopsWhenAnActionFailsTheContext()
+    {
+        $result = ReduceUntilStopsOnFailureOrganizer::call();
+
+        $this->assertTrue($result->failure());
+        // A failed context can never satisfy the predicate, so the loop must
+        // give up rather than spin. One evaluation is all it should take.
+        $this->assertLessThanOrEqual(2, ReduceUntilStopsOnFailureOrganizer::$predicate_calls);
+    }
+
+    public function testReduceUntilStopsWhenAnActionSkipsTheRemainingActions()
+    {
+        $result = ReduceUntilStopsOnSkipOrganizer::call();
+
+        $this->assertTrue($result->mustSkipAllRemainingActions());
+        $this->assertLessThanOrEqual(2, ReduceUntilStopsOnSkipOrganizer::$predicate_calls);
+    }
+
+    public function testIterateStopsOnceAnActionFailsTheContext()
+    {
+        $result = IterateStopsOnFailureOrganizer::call();
+
+        $this->assertTrue($result->failure());
+        $this->assertEquals([1], $result->processed);
+    }
+
+    public function testIterateStopsOnceAnActionSkipsTheRemainingActions()
+    {
+        $result = IterateStopsOnSkipOrganizer::call();
+
+        $this->assertTrue($result->mustSkipAllRemainingActions());
+        $this->assertEquals([1], $result->processed);
+    }
+
+    public function testIterateRollsBackTheItemsItAlreadyProcessed()
+    {
+        $result = IterateRollbackOrganizer::call();
+
+        $this->assertTrue($result->failure());
+        $this->assertEquals([], $result->charged);
+        $this->assertEquals([2, 1], $result->refunded);
+    }
+
+    public function testIterateLeavesAnExistingKeyMatchingTheSingularisedNameAlone()
+    {
+        $result = IterateWithExistingSingularKeyOrganizer::call();
+
+        $this->assertEquals([1, 2], $result->processed);
+        $this->assertEquals('something the caller put there', $result->item);
+    }
+
+    public function testIterateRunsTheOrganizersHooksAroundEachAction()
+    {
+        $result = IterateWithHooksOrganizer::call();
+
+        $this->assertEquals([1, 2], $result->processed);
+        $this->assertEquals(['before', 'after', 'before', 'after'], $result->hooks_called);
+    }
+    public function testIterateRaisesWhenTheKeyDoesNotHoldSomethingIterable()
+    {
+        $this->expectException(KeyIsNotIterableException::class);
+        $this->expectExceptionMessage('items');
+
+        IterateOverANonIterableOrganizer::call();
+    }
+
+    public function testIterateTreatsAMissingKeyAsNothingToDo()
+    {
+        $result = IterateOverAMissingKeyOrganizer::call();
+
+        $this->assertEquals([], $result->processed);
+        $this->assertFalse($result->failure());
+    }
+
+    public function testTheClosingHooksStillRunWhenAnActionThrows()
+    {
+        $organizer = ThrowingActionWithHooksOrganizer::with(['hooks_called' => []]);
+
+        try {
+            $organizer->reduce(\LightService\Fixtures\Actions\ThrowsUnexpectedlyAction::class);
+            $this->fail('Expected the action to throw');
+        } catch (RuntimeException $e) {
+            // The around hook has to close, or a timing or logging hook would
+            // silently never finish.
+            $this->assertEquals(
+                ['around', 'before', 'after', 'around'],
+                $organizer->context->hooks_called
+            );
+        }
+    }
+
+    public function testKeyAliasesAreUnwoundWhenAnActionThrows()
+    {
+        $organizer = ThrowingActionWithAliasesOrganizer::with(['number' => 1]);
+
+        try {
+            $organizer->reduce(\LightService\Fixtures\Actions\ThrowsWithAnAliasedKeyAction::class);
+            $this->fail('Expected the action to throw');
+        } catch (RuntimeException $e) {
+            $this->assertEquals(['number'], $organizer->context->keys());
+        }
+    }
+
+    public function testReducingAgainAfterARollbackDoesNothing()
+    {
+        $result = ReduceTwiceAfterRollbackOrganizer::call();
+
+        // The rolling-back action already undid itself, taking 1 to 0. The
+        // second reduce must not run its action or replay anything.
+        $this->assertEquals(0, $result->number);
+        $this->assertTrue($result->failure());
     }
 }

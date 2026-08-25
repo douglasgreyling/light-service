@@ -1,24 +1,30 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace LightService\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use LightService\ContextMetadata;
 
-final class ContextMetadataTest extends TestCase {
-    public function test_it_is_instantiated_with_the_default_metadata_values() {
+final class ContextMetadataTest extends TestCase
+{
+    public function testItIsInstantiatedWithTheDefaultMetadataValues()
+    {
         $context_metadata = new ContextMetadata();
 
-        foreach(ContextMetadata::DEFAULT_METADATA as $metadata => $default)
+        foreach (ContextMetadata::DEFAULT_METADATA as $metadata => $default) {
             $this->assertEquals($default, $context_metadata->$metadata);
+        }
     }
 
-    public function test_it_can_be_convert_to_an_array() {
+    public function testItCanBeConvertToAnArray()
+    {
         $context_metadata = new ContextMetadata();
 
-        $this->assertEquals(ContextMetadata::DEFAULT_METADATA, $context_metadata->to_array());
+        $this->assertEquals(ContextMetadata::DEFAULT_METADATA, $context_metadata->toArray());
     }
 
-    public function test_it_can_mark_the_failure_flag_as_true() {
+    public function testItCanMarkTheFailureFlagAsTrue()
+    {
         $context_metadata = new ContextMetadata();
 
         $context_metadata->fail();
@@ -26,7 +32,8 @@ final class ContextMetadataTest extends TestCase {
         $this->assertTrue($context_metadata->failure);
     }
 
-    public function test_it_can_mark_the_failure_flag_as_true_with_a_message() {
+    public function testItCanMarkTheFailureFlagAsTrueWithAMessage()
+    {
         $context_metadata = new ContextMetadata();
 
         $context_metadata->fail('Foo');
@@ -34,7 +41,8 @@ final class ContextMetadataTest extends TestCase {
         $this->assertEquals('Foo', $context_metadata->message);
     }
 
-    public function test_it_can_mark_the_failure_flag_as_true_with_a_message_and_an_error_code() {
+    public function testItCanMarkTheFailureFlagAsTrueWithAMessageAndAnErrorCode()
+    {
         $context_metadata = new ContextMetadata();
 
         $context_metadata->fail('Foo', 100);
@@ -43,7 +51,8 @@ final class ContextMetadataTest extends TestCase {
         $this->assertEquals(100, $context_metadata->error_code);
     }
 
-    public function test_it_returns_a_value_of_null_when_the_property_being_fetched_does_not_exist_in_the_context_metadata() {
+    public function testItReturnsAValueOfNullWhenThePropertyBeingFetchedDoesNotExistInTheContextMetadata()
+    {
         $context = new ContextMetadata();
 
         $this->assertNull($context->b);
